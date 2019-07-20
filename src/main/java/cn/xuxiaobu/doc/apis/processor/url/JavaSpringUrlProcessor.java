@@ -21,6 +21,11 @@ import java.util.stream.Stream;
  * @date 2019-07-20 09:11
  */
 public class JavaSpringUrlProcessor implements ApiUrlDefinitionProcessor {
+    /** 存放url的map集合key  */
+    final String urlKey = "url";
+    /**  存放method的map集合key */
+    final String methodKey = "method";
+
 
     @Override
     public Integer getOrder() {
@@ -52,21 +57,21 @@ public class JavaSpringUrlProcessor implements ApiUrlDefinitionProcessor {
         RequestMapping rootUrlAnno = defaultJavaApiDefinition.getClazzMateData().getDeclaredAnnotation(RequestMapping.class);
         Map<String, List<String>> rootMap = Optional.ofNullable(rootUrlAnno).map(k -> getUrlAndSupportedMethod(k)).orElse(null);
         if (rootMap != null) {
-            map.get("method").addAll(rootMap.get("method"));
+            map.get(methodKey).addAll(rootMap.get(methodKey));
             ArrayList<String> temp = new ArrayList<>();
-            for (String rm : rootMap.get("url")) {
-                for (String m : map.get("url")) {
+            for (String rm : rootMap.get(urlKey)) {
+                for (String m : map.get(urlKey)) {
                     temp.add(rm + m);
                 }
             }
-            map.put("url", temp);
+            map.put(urlKey, temp);
         }
-        if (map.get("method").isEmpty()) {
+        if (map.get(methodKey).isEmpty()) {
             /** 如果都没有直接定义支持的请求方式,就默认支持get和post */
-            map.put("method", Stream.of(RequestMethod.POST.name(), RequestMethod.GET.name()).collect(Collectors.toList()));
+            map.put(methodKey, Stream.of(RequestMethod.POST.name(), RequestMethod.GET.name()).collect(Collectors.toList()));
         }
-        defaultJavaApiDefinition.setMethod(map.get("method"));
-        defaultJavaApiDefinition.setUrl(map.get("url"));
+        defaultJavaApiDefinition.setMethod(map.get(methodKey));
+        defaultJavaApiDefinition.setUrl(map.get(urlKey));
     }
 
 
@@ -75,8 +80,8 @@ public class JavaSpringUrlProcessor implements ApiUrlDefinitionProcessor {
         String[] subUrl = Optional.ofNullable(requestMapping).map(r -> ArrayUtils.addAll(r.value(), r.path())).get();
         List<String> subUrlList = Stream.of(subUrl).map(m -> StringUtils.startsWith(m, "/") || m.isEmpty() ? m : "/" + m).collect(Collectors.toList());
         List<String> supportMethod = Stream.of(requestMapping.method()).map(m -> m.name()).collect(Collectors.toList());
-        map.put("url", subUrlList);
-        map.put("method", supportMethod);
+        map.put(urlKey, subUrlList);
+        map.put(methodKey, supportMethod);
         return map;
     }
 
@@ -86,8 +91,8 @@ public class JavaSpringUrlProcessor implements ApiUrlDefinitionProcessor {
         String[] subUrl = Optional.ofNullable(postMapping).map(r -> ArrayUtils.addAll(r.value(), r.path())).get();
         List<String> subUrlList = Stream.of(subUrl).map(m -> StringUtils.startsWith(m, "/") || m.isEmpty() ? m : "/" + m).collect(Collectors.toList());
         List<String> supportMethod = Stream.of(RequestMethod.POST.name()).collect(Collectors.toList());
-        map.put("url", subUrlList);
-        map.put("method", supportMethod);
+        map.put(urlKey, subUrlList);
+        map.put(methodKey, supportMethod);
         return map;
     }
 
@@ -96,8 +101,8 @@ public class JavaSpringUrlProcessor implements ApiUrlDefinitionProcessor {
         String[] subUrl = Optional.ofNullable(getMapping).map(r -> ArrayUtils.addAll(r.value(), r.path())).get();
         List<String> subUrlList = Stream.of(subUrl).map(m -> StringUtils.startsWith(m, "/") || m.isEmpty() ? m : "/" + m).collect(Collectors.toList());
         List<String> supportMethod = Stream.of(RequestMethod.GET.name()).collect(Collectors.toList());
-        map.put("url", subUrlList);
-        map.put("method", supportMethod);
+        map.put(urlKey, subUrlList);
+        map.put(methodKey, supportMethod);
         return map;
     }
 

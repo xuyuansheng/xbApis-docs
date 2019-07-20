@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * @author 020102
  * @date 2019-07-19 09:24
  */
-public abstract class JavaProcessSynopsis {
+public abstract class AbstractJavaProcessSynopsis {
     /**
      * 环境配置
      */
@@ -59,7 +59,7 @@ public abstract class JavaProcessSynopsis {
         apiDefinitionProcess();
     }
 
-    public JavaProcessSynopsis(JavaConfig javaConfig) {
+    public AbstractJavaProcessSynopsis(JavaConfig javaConfig) {
         this.javaConfig = javaConfig;
     }
 

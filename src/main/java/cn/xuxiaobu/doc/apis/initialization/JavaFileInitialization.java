@@ -88,7 +88,7 @@ public class JavaFileInitialization implements SourceFileInitialization {
     @Override
     public LinkedHashMap<String, Object> initSourceCompressedFile(LinkedHashMap<String, Object> root, URL source) throws IOException {
         root = Optional.ofNullable(root).orElse(new LinkedHashMap<>());
-        URL jarSource = Optional.ofNullable(source).filter(k -> k.getProtocol().equals("file"))
+        URL jarSource = Optional.ofNullable(source).filter(k -> "file".equals(k.getProtocol()))
                 .filter(k -> StringUtils.endsWith(k.getPath(), compressedFormat)).orElse(null);
         if (jarSource == null) {
             return root;
