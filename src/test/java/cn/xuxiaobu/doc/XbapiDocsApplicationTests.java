@@ -1,4 +1,4 @@
-package cn.xuxiaobu.doc.xbapidocs;
+package cn.xuxiaobu.doc;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
