@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
  * @author 020102
  * @date 2019-07-19 10:05
  */
-public class AbstractJavaProcessSynopsisMaven extends AbstractJavaProcessSynopsis {
+public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
 
 
-    public AbstractJavaProcessSynopsisMaven(JavaConfig javaConfig) {
+    public MavenJavaProcessSynopsis(JavaConfig javaConfig) {
         super(javaConfig);
     }
 
