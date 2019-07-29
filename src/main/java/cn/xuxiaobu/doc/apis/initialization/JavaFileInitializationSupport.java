@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
  * @author 020102
  * @date 2019-07-18 10:01
  */
-public class JavaFileInitialization implements SourceFileInitialization {
+public class JavaFileInitializationSupport  {
     /**
      * 文件后缀
      */
@@ -34,10 +34,10 @@ public class JavaFileInitialization implements SourceFileInitialization {
      */
     private Boolean ifFailFast = true;
 
-    public JavaFileInitialization() {
+    public JavaFileInitializationSupport() {
     }
 
-    public JavaFileInitialization(Boolean ifFailFast) {
+    public JavaFileInitializationSupport(Boolean ifFailFast) {
         this.ifFailFast = ifFailFast;
     }
 
@@ -48,7 +48,6 @@ public class JavaFileInitialization implements SourceFileInitialization {
      * @param source 源文件URL
      * @return
      */
-    @Override
     public LinkedHashMap<String, Object> initSourceClasses(LinkedHashMap<String, Object> root, URL source) throws MalformedURLException {
         root = Optional.ofNullable(root).orElse(new LinkedHashMap<>());
         File classesSource = new File(source.getFile());
@@ -85,7 +84,6 @@ public class JavaFileInitialization implements SourceFileInitialization {
      * @param source 源文件URL
      * @return
      */
-    @Override
     public LinkedHashMap<String, Object> initSourceCompressedFile(LinkedHashMap<String, Object> root, URL source) throws IOException {
         root = Optional.ofNullable(root).orElse(new LinkedHashMap<>());
         URL jarSource = Optional.ofNullable(source).filter(k -> "file".equals(k.getProtocol()))

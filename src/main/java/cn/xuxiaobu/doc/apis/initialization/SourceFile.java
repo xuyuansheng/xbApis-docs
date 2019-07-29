@@ -1,5 +1,7 @@
 package cn.xuxiaobu.doc.apis.initialization;
 
+import org.springframework.core.io.Resource;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,6 +15,8 @@ import java.net.URL;
 public interface SourceFile {
 
     InputStream getStream(String index) throws IOException;
+
+    Resource getResource(String index);
 
     void addSources(URL source) throws IOException;
 

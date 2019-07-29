@@ -1,14 +1,17 @@
 package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
-import cn.xuxiaobu.doc.apis.initialization.JavaFileInitialization;
+import cn.xuxiaobu.doc.apis.initialization.JavaFileInitializationSupport;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
+import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
+import cn.xuxiaobu.doc.config.JavaConfig;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,9 +40,9 @@ public abstract class AbstractJavaProcessSynopsis {
      */
     protected URLClassLoader urlClassLoader;
     /**
-     * 所有可能存在API的类的全类名
+     * 所有可能存在API的类
      */
-    protected List<String> apiJavaNames;
+    protected List<Class<?>> apiJavaClasses;
 
     protected List<ApiDefinition> apiDefinitions;
 
@@ -71,7 +74,7 @@ public abstract class AbstractJavaProcessSynopsis {
                 throw new InitSourceException(source);
             }
             URL url = sourceFile.toURI().toURL();
-            this.javaSourceFileContext = new JavaSourceFileContext(new JavaFileInitialization(), Stream.of(url).collect(Collectors.toList()));
+            this.javaSourceFileContext = new JavaSourceFileContext(new JavaFileInitializationSupport(), Stream.of(url).collect(Collectors.toList()));
         } catch (MalformedURLException e) {
             throw new InitSourceException(source, e);
         }
@@ -92,8 +95,8 @@ public abstract class AbstractJavaProcessSynopsis {
                 e.printStackTrace();
                 return null;
             }
-        }).collect(Collectors.toList());
-        this.javaDependencySourceFileContext = new JavaSourceFileContext(new JavaFileInitialization(), urls);
+        }).filter(n->n!=null).collect(Collectors.toList());
+        this.javaDependencySourceFileContext = new JavaSourceFileContext(new JavaFileInitializationSupport(), urls);
     }
 
     protected void loadDependencyClassSource() {
@@ -112,7 +115,7 @@ public abstract class AbstractJavaProcessSynopsis {
                 e.printStackTrace();
                 return null;
             }
-        }).collect(Collectors.toList());
+        }).filter(n->n!=null).collect(Collectors.toList());
         URL[] urlArray = urls.stream().toArray(k -> new URL[urls.size()]);
         this.urlClassLoader = new URLClassLoader(urlArray, Thread.currentThread().getContextClassLoader());
     }
@@ -123,5 +126,22 @@ public abstract class AbstractJavaProcessSynopsis {
 
     protected abstract void apiDefinitionProcess();
 
+    /**
+     * 把Java的class类转换为API数据定义
+     * @param apiJavaClasses
+     * @param javaDependencySourceFileContext
+     * @return
+     */
+    protected List<ApiDefinition> doGetApiDefinition(List<Class<?>> apiJavaClasses,JavaSourceFileContext javaDependencySourceFileContext){
+        List<ApiDefinition> definitions = apiJavaClasses.stream().map(k -> {
+            JavaApiParser parse = new JavaApiParser(javaDependencySourceFileContext);
+            List<ApiDefinition> res = parse.parse(k);
+            return res;
+        }).filter(f -> f != null).reduce((r1, r2) -> {
+            r1.addAll(r2);
+            return r1;
+        }).orElse(new ArrayList<>(0));
+        return definitions;
+    }
 
 }

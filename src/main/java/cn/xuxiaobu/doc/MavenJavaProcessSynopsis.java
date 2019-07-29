@@ -1,13 +1,17 @@
 package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
+import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
+import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
+import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaCommonMethodFilter;
+import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaSpringMethodFilter;
 import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.apis.processor.url.JavaSpringUrlProcessor;
+import cn.xuxiaobu.doc.config.JavaConfig;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -30,24 +34,32 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
 
     @Override
     protected void getApiMetadata() {
-        Optional<List<ApiDefinition>> definitionList = super.apiJavaNames.stream().map(k -> {
-            JavaApiParser parse = new JavaApiParser(super.javaDependencySourceFileContext.getRoot(), super.urlClassLoader);
-            List<ApiDefinition> res = parse.parse(k);
-            return res;
-        }).filter(f -> f != null).reduce((r1, r2) -> {
-            r1.addAll(r2);
-            return r1;
-        });
-        super.apiDefinitions = definitionList.orElse(new ArrayList<>(0));
+
+        List<ApiDefinition> definitions = super.doGetApiDefinition(super.apiJavaClasses, super.javaDependencySourceFileContext);
+
+        List<ApiDefinition> definitionTemp = definitions.stream()
+                .filter(d -> new JavaCommonMethodFilter().doFilter(((DefaultJavaApiDefinition) d).getMethodMateData()))
+                .filter(d -> new JavaSpringMethodFilter().doFilter(((DefaultJavaApiDefinition) d).getMethodMateData()))
+                .collect(Collectors.toList());
+
+        super.apiDefinitions = definitionTemp;
     }
 
     @Override
     protected void filterJavaApiNames() {
         List<String> names = javaSourceFileContext.getJavaFileNames();
-        super.apiJavaNames = names.stream().filter(new JavaSpringControllerFilter(super.urlClassLoader)::doFilter).collect(Collectors.toList());
-
-
+        super.apiJavaClasses = names.stream()
+                .map(m->{
+                    try {
+                        return urlClassLoader.loadClass(m);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(n->n!=null)
+                .filter(new JavaSpringControllerFilter()::doFilter)
+                .filter(new JavaCommonClassFilter()::doFilter)
+                .collect(Collectors.toList());
     }
-
-
 }

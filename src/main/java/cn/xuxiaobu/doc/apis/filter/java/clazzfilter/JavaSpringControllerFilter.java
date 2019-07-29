@@ -11,20 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 public class JavaSpringControllerFilter implements JavaApiFilter {
 
-    ClassLoader loader;
-
-    public JavaSpringControllerFilter(ClassLoader loader) {
-        this.loader = loader;
-    }
-
     @Override
-    public Boolean doFilter(String className) {
-        try {
-            Class<?> clazz = loader.loadClass(className);
-            return clazz.isAnnotationPresent(RestController.class) || clazz.isAnnotationPresent(Controller.class);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public Boolean doFilter(Class<?> clazz) {
+        return clazz.isAnnotationPresent(RestController.class) || clazz.isAnnotationPresent(Controller.class);
     }
 }

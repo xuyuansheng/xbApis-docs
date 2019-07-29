@@ -25,19 +25,19 @@ import java.util.stream.Stream;
 @Getter
 public class JavaSourceFileContext implements SourceFile {
 
-    private JavaFileInitialization javaFileInitialization;
+    private JavaFileInitializationSupport javaFileInitializationSupport;
 
     private LinkedHashMap root = new LinkedHashMap(16);
 
     private List<URL> sourceFile;
 
-    public JavaSourceFileContext(JavaFileInitialization javaFileInitialization) {
-        this.javaFileInitialization = javaFileInitialization;
+    public JavaSourceFileContext(JavaFileInitializationSupport javaFileInitializationSupport) {
+        this.javaFileInitializationSupport = javaFileInitializationSupport;
         this.sourceFile = new ArrayList<>(0);
     }
 
-    public JavaSourceFileContext(JavaFileInitialization javaFileInitialization, List<URL> source) {
-        this.javaFileInitialization = javaFileInitialization;
+    public JavaSourceFileContext(JavaFileInitializationSupport javaFileInitializationSupport, List<URL> source) {
+        this.javaFileInitializationSupport = javaFileInitializationSupport;
         this.sourceFile = source;
         try {
             init();
@@ -54,14 +54,19 @@ public class JavaSourceFileContext implements SourceFile {
      */
     private void init() throws IOException {
         for (URL url : sourceFile) {
-            root = javaFileInitialization.initSourceClasses(root, url);
-            root = javaFileInitialization.initSourceCompressedFile(root, url);
+            root = javaFileInitializationSupport.initSourceClasses(root, url);
+            root = javaFileInitializationSupport.initSourceCompressedFile(root, url);
         }
     }
 
     @Override
     public InputStream getStream(String index) throws IOException {
+        Resource resource = this.getResource(index);
+        return resource==null?null:resource.getInputStream();
+    }
 
+    @Override
+    public Resource getResource(String index) {
         String[] names = StringUtils.split(index, ".");
         LinkedHashMap temp = root;
         Object value = null;
@@ -71,7 +76,7 @@ public class JavaSourceFileContext implements SourceFile {
                 break;
             }
             if (value instanceof Resource) {
-                return ((Resource) value).getInputStream();
+                return ((Resource) value);
             }
             temp = (LinkedHashMap) value;
         }
@@ -86,8 +91,8 @@ public class JavaSourceFileContext implements SourceFile {
      */
     @Override
     public void addSources(URL source) throws IOException {
-        root = javaFileInitialization.initSourceClasses(root, source);
-        root = javaFileInitialization.initSourceCompressedFile(root, source);
+        root = javaFileInitializationSupport.initSourceClasses(root, source);
+        root = javaFileInitializationSupport.initSourceCompressedFile(root, source);
         this.sourceFile.add(source);
     }
 
@@ -109,6 +114,7 @@ public class JavaSourceFileContext implements SourceFile {
     private void doGetJavaFileNames(List<String> names, File file, String rootPath) {
         final String suffix = ".java";
         final String dot = ".";
+        final String infoJava = "package-info";
         names = Optional.ofNullable(names).orElse(new ArrayList<>());
         if (file.isDirectory()) {
             List<String> finalNames = names;
@@ -118,6 +124,9 @@ public class JavaSourceFileContext implements SourceFile {
             String result = StringUtils.substringBetween(path, rootPath, suffix).replace(File.separator, dot);
             if (StringUtils.startsWith(result, dot)) {
                 result = result.substring(1);
+            }
+            if(result.contains(infoJava)){
+                return;
             }
             names.add(result);
         }

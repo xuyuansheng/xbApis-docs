@@ -1,5 +1,7 @@
-package cn.xuxiaobu.doc;
+package cn.xuxiaobu.doc.config;
 
+import cn.xuxiaobu.doc.apis.filter.java.JavaApiFilter;
+import cn.xuxiaobu.doc.apis.processor.url.ApiUrlDefinitionProcessor;
 import lombok.Data;
 
 import java.util.List;
@@ -30,6 +32,16 @@ public class JavaConfig {
      * 项目依赖的jar包或class文件根目录
      */
     List<String> sourceDependencyClass;
+
+
+    /**
+     * 类和方法过滤器
+     */
+    List<JavaApiFilter> apiFilters;
+    /**
+     * Url处理器
+     */
+    List<ApiUrlDefinitionProcessor> urlDefinitionProcessors;
 
     public JavaConfig(String sourceJavaDir, String sourceClassDir) {
         this.sourceJavaDir = sourceJavaDir;

@@ -12,5 +12,5 @@ import java.util.List;
  */
 @FunctionalInterface
 public interface ApiParser {
-    List<ApiDefinition> parse(String name);
+    List<ApiDefinition> parse(Class<?> name);
 }

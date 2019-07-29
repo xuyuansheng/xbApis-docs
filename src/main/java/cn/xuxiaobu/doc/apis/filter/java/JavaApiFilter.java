@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @date 2019-07-18 16:09
  */
 public interface JavaApiFilter extends ApiFilter {
-    default Boolean doFilter(String className) {
+    default Boolean doFilter(Class<?> clazz) {
         return true;
     }
 

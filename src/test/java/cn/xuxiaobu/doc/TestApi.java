@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc;
 
-import cn.xuxiaobu.doc.apis.initialization.JavaFileInitialization;
+import cn.xuxiaobu.doc.apis.initialization.JavaFileInitializationSupport;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import org.junit.Test;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +34,10 @@ public class TestApi {
         urls.add(new File(sourceJar).toURI().toURL());
         urls.add(new File(sourceClasses).toURI().toURL());
 
-        JavaFileInitialization javaFileInitialization = new JavaFileInitialization();
-        JavaSourceFileContext javaSourceFileContext = new JavaSourceFileContext(javaFileInitialization, urls);
+        JavaFileInitializationSupport javaFileInitializationSupport = new JavaFileInitializationSupport();
+        JavaSourceFileContext javaSourceFileContext = new JavaSourceFileContext(javaFileInitializationSupport, urls);
 
-        javaSourceFileContext.getStream("cn.xys.maven.api.indexinitialization.JavaFileInitialization");
+        javaSourceFileContext.getStream("cn.xys.maven.api.indexinitialization.JavaFileInitializationSupport");
         javaSourceFileContext.getStream("org.springframework.core.io.AbstractFileResolvingResource");
 
         System.out.println(javaSourceFileContext);
