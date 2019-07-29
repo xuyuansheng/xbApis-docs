@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 020102
  * @date 2019-07-18 16:12
  */
-public class JavaSpringControllerFilter implements JavaApiFilter {
+public class JavaSpringControllerFilter implements JavaApiFilter<Class<?>> {
 
     @Override
     public Boolean doFilter(Class<?> clazz) {

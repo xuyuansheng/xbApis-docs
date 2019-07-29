@@ -10,12 +10,9 @@ import java.lang.reflect.Method;
  * @author 020102
  * @date 2019-07-18 16:09
  */
-public interface JavaApiFilter extends ApiFilter {
-    default Boolean doFilter(Class<?> clazz) {
-        return true;
-    }
+public interface JavaApiFilter<T> extends ApiFilter {
 
-    default Boolean doFilter(Method method) {
+    default Boolean doFilter(T target) {
         return true;
     }
 }

@@ -2,15 +2,15 @@ package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
+import cn.xuxiaobu.doc.apis.filter.java.ChainFilterUtils;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaCommonMethodFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaSpringMethodFilter;
-import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.apis.processor.url.JavaSpringUrlProcessor;
 import cn.xuxiaobu.doc.config.JavaConfig;
 
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,8 +38,7 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
         List<ApiDefinition> definitions = super.doGetApiDefinition(super.apiJavaClasses, super.javaDependencySourceFileContext);
 
         List<ApiDefinition> definitionTemp = definitions.stream()
-                .filter(d -> new JavaCommonMethodFilter().doFilter(((DefaultJavaApiDefinition) d).getMethodMateData()))
-                .filter(d -> new JavaSpringMethodFilter().doFilter(((DefaultJavaApiDefinition) d).getMethodMateData()))
+                .filter(d -> new ChainFilterUtils<Method>(new JavaCommonMethodFilter(), new JavaSpringMethodFilter()).doFilterOr(((DefaultJavaApiDefinition) d).getMethodMateData()))
                 .collect(Collectors.toList());
 
         super.apiDefinitions = definitionTemp;
@@ -49,7 +48,7 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
     protected void filterJavaApiNames() {
         List<String> names = javaSourceFileContext.getJavaFileNames();
         super.apiJavaClasses = names.stream()
-                .map(m->{
+                .map(m -> {
                     try {
                         return urlClassLoader.loadClass(m);
                     } catch (ClassNotFoundException e) {
@@ -57,9 +56,8 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
                         return null;
                     }
                 })
-                .filter(n->n!=null)
-                .filter(new JavaSpringControllerFilter()::doFilter)
-                .filter(new JavaCommonClassFilter()::doFilter)
+                .filter(n -> n != null)
+                .filter(new ChainFilterUtils<Class<?>>(new JavaCommonClassFilter(), new JavaSpringControllerFilter())::doFilterOr)
                 .collect(Collectors.toList());
     }
 }

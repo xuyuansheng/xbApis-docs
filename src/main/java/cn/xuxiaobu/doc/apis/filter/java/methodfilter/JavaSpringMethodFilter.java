@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @author 020102
  * @date 2019-07-19 14:09
  */
-public class JavaSpringMethodFilter implements JavaApiFilter {
+public class JavaSpringMethodFilter implements JavaApiFilter<Method> {
     @Override
     public Boolean doFilter(Method method) {
         return method.isAnnotationPresent(RequestMapping.class)
