@@ -1,5 +1,7 @@
 package cn.xuxiaobu.doc.apis.definition;
 
+import cn.xuxiaobu.doc.apis.enums.JavaType;
+
 import java.util.List;
 
 /**
@@ -33,5 +35,9 @@ public interface ApiDefinition {
     ApiDefinition setMethod(List<String> method);
 
     String getDefinitionName();
+
+    JavaType getDefinitionFrom();
+
+    ApiDefinition setDefinitionFrom(JavaType definitionType);
 
 }

@@ -2,6 +2,7 @@ package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
+import cn.xuxiaobu.doc.apis.enums.JavaType;
 import cn.xuxiaobu.doc.apis.filter.java.ChainFilterUtils;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
@@ -27,7 +28,7 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
 
     @Override
     protected void apiDefinitionProcess() {
-        super.apiDefinitions.stream().forEach(dfn -> {
+        super.apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.SPRING_JAVA)).forEach(dfn -> {
             new JavaSpringUrlProcessor().postUrlProcess(dfn);
         });
     }

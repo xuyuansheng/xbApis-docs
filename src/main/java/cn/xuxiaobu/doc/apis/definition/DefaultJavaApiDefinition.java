@@ -1,5 +1,6 @@
 package cn.xuxiaobu.doc.apis.definition;
 
+import cn.xuxiaobu.doc.apis.enums.JavaType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.core.io.Resource;
@@ -29,7 +30,12 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
      * API的方法元数据
      */
     private Method methodMateData;
-
+    /**
+     * API的来源类型,
+     * 1.从spring的RequestMapping,PostMapping等注解解析获取
+     * 2.从自定义的注解Apis解析获取
+     */
+    private JavaType definitionFrom;
     /**
      * 协议
      */
@@ -71,10 +77,10 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
 
     @Override
     public String getDefinitionName() {
-        if(this.clazzMateData==null||this.methodMateData==null){
+        if (this.clazzMateData == null || this.methodMateData == null) {
             return "";
         }
-        return this.clazzMateData.getName()+" : "+this.methodMateData.getName();
+        return this.clazzMateData.getName() + " : " + this.methodMateData.getName();
     }
 
 }
