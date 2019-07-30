@@ -1,6 +1,7 @@
 package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
+import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import cn.xuxiaobu.doc.apis.initialization.JavaFileInitializationSupport;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
@@ -120,10 +121,21 @@ public abstract class AbstractJavaProcessSynopsis {
         this.urlClassLoader = new URLClassLoader(urlArray, Thread.currentThread().getContextClassLoader());
     }
 
+    /**
+     * 过滤源码文件获取到所有的可能有API的Java类
+     */
     protected abstract void filterJavaApiNames();
 
+    /**
+     * 过滤方法上的注解等数据获取到所有的API定义,此处的结果只有元数据
+     * 如:clazzMateData,javaFileMateData,methodMateData
+     * @see DefaultJavaApiDefinition
+     */
     protected abstract void getApiMetadata();
 
+    /**
+     * 处理API定义数据,获得完整的结果数据
+     */
     protected abstract void apiDefinitionProcess();
 
     /**

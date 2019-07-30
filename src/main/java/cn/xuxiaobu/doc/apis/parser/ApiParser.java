@@ -12,5 +12,11 @@ import java.util.List;
  */
 @FunctionalInterface
 public interface ApiParser {
+    /**
+     * 把class转换为 ApiDefinition
+     * @see ApiDefinition
+     * @param name 被转换的clazz类
+     * @return API定义
+     */
     List<ApiDefinition> parse(Class<?> name);
 }

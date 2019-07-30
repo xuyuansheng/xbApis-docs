@@ -13,11 +13,26 @@ import java.net.URL;
  * @date 2019-07-18 09:59
  */
 public interface SourceFile {
-
+    /**
+     * 获取数据流
+     * @param index 类的全路径名
+     * @return
+     * @throws IOException
+     */
     InputStream getStream(String index) throws IOException;
 
+    /**
+     * 获取源文件
+     * @param index 类的全路径名
+     * @return
+     */
     Resource getResource(String index);
 
+    /**
+     * 添加源文件
+     * @param source
+     * @throws IOException
+     */
     void addSources(URL source) throws IOException;
 
 }

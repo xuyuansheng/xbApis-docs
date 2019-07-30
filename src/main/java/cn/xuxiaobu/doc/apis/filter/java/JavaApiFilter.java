@@ -11,7 +11,11 @@ import java.lang.reflect.Method;
  * @date 2019-07-18 16:09
  */
 public interface JavaApiFilter<T> extends ApiFilter {
-
+    /**
+     * 过滤器方法
+     * @param target  被过滤的目标
+     * @return 结果
+     */
     default Boolean doFilter(T target) {
         return true;
     }
