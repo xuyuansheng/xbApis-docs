@@ -1,10 +1,10 @@
 package cn.xuxiaobu.doc.apis.processor.url;
 
 import cn.xuxiaobu.doc.apis.annotions.Apis;
+import cn.xuxiaobu.doc.apis.annotions.JdkDynamicProxy;
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import cn.xuxiaobu.doc.util.processor.ProcessorUtils;
-import com.alibaba.fastjson.JSON;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -36,13 +36,13 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
         List<String> methodListResult = new ArrayList<>(0);
         StringBuilder url = new StringBuilder();
         Class<?> clazzData = defaultJavaApiDefinition.getClazzMateData();
-        Apis clazzApis = doGetAnnotion(clazzData);
+        Apis clazzApis = doGetAnnotation(clazzData);
         Optional.of(clazzApis).ifPresent(api->{
             methodListResult.addAll(Stream.of(api.method()).collect(Collectors.toList()));
             url.append(ProcessorUtils.urlFormat(api.value()));
         });
         Method methodMateData = defaultJavaApiDefinition.getMethodMateData();
-        Apis methodApis = doGetAnnotion(methodMateData);
+        Apis methodApis = doGetAnnotation(methodMateData);
         Optional.of(methodApis).ifPresent(api->{
             methodListResult.addAll(Stream.of(api.method()).collect(Collectors.toList()));
             url.append(ProcessorUtils.urlFormat(api.value()));
@@ -60,7 +60,7 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
      * @param clazz
      * @return
      */
-    private Apis doGetAnnotion(Class<?> clazz){
+    private Apis doGetAnnotation(Class<?> clazz){
         Apis urlAnnotation = clazz.getDeclaredAnnotation(Apis.class);
         if (urlAnnotation != null) {
             return urlAnnotation;
@@ -69,7 +69,7 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
                 .findAny();
         if(apis.isPresent()){
             Annotation api = apis.get();
-           return JSON.parseObject(JSON.toJSONString(api), Apis.class);
+           return new JdkDynamicProxy(api).getProxy();
         }
         return null;
     }
@@ -79,7 +79,7 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
      * @param method
      * @return
      */
-    private Apis doGetAnnotion(Method method){
+    private Apis doGetAnnotation(Method method){
         Apis urlAnnotation = method.getDeclaredAnnotation(Apis.class);
         if (urlAnnotation != null) {
             return urlAnnotation;
@@ -88,7 +88,7 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
                 .findAny();
         if(apis.isPresent()){
             Annotation api = apis.get();
-            return JSON.parseObject(JSON.toJSONString(api), Apis.class);
+            return new JdkDynamicProxy(api).getProxy();
         }
         return null;
     }
