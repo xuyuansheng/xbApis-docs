@@ -8,6 +8,7 @@ import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaCommonMethodFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaSpringMethodFilter;
+import cn.xuxiaobu.doc.apis.processor.url.JavaCommonUrlProcessor;
 import cn.xuxiaobu.doc.apis.processor.url.JavaSpringUrlProcessor;
 import cn.xuxiaobu.doc.config.JavaConfig;
 
@@ -28,8 +29,12 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
 
     @Override
     protected void apiDefinitionProcess() {
+        /* 处理URL和支持的请求方式 */
         super.apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.SPRING_JAVA)).forEach(dfn -> {
             new JavaSpringUrlProcessor().postUrlProcess(dfn);
+        });
+        super.apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.COMMON_JAVA)).forEach(dfn -> {
+            new JavaCommonUrlProcessor().postUrlProcess(dfn);
         });
     }
 

@@ -12,6 +12,19 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Apis {
-
+    /**  */
+    String name() default "";
+    
     String value() default "";
+    
+    String[] method()default {};
+    
+    String[] params() default {};
+
+    String[] headers() default {};
+
+    String[] consumes() default {};
+
+    String[] produces() default {};
+    
 }

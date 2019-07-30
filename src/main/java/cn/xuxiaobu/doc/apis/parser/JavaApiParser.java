@@ -26,15 +26,17 @@ public class JavaApiParser implements ApiParser {
     public JavaApiParser(SourceFile root) {
         this.root = root;
     }
+
     @Override
     public List<ApiDefinition> parse(Class<?> clazz) {
         Resource javaSourceFile = root.getResource(clazz.getName());
+        final JavaType javaType = doGetDefinitionFrom(clazz);
         List<ApiDefinition> methods = Stream.of(clazz.getDeclaredMethods())
                 .filter(m -> Modifier.isPublic(m.getModifiers()))
                 .map(m ->
                         new DefaultJavaApiDefinition()
                                 .setClazzMateData(clazz)
-                                .setDefinitionFrom(doGetDefinitionFrom(clazz))
+                                .setDefinitionFrom(javaType)
                                 .setMethodMateData(m)
                                 .setJavaFileMateData(javaSourceFile)
                 ).collect(Collectors.toList());
@@ -43,17 +45,18 @@ public class JavaApiParser implements ApiParser {
 
     /**
      * 获取Java项目定义来源
+     *
      * @param clazz
      * @return
      */
-    private JavaType doGetDefinitionFrom(Class<?> clazz){
-            if(new JavaSpringControllerFilter().doFilter(clazz)){
-                return JavaType.SPRING_JAVA;
-            } else if (new JavaCommonClassFilter().doFilter(clazz)) {
-                return JavaType.COMMON_JAVA;
-            }else {
-                return JavaType.UNKNOWN;
-            }
+    private JavaType doGetDefinitionFrom(Class<?> clazz) {
+        if (new JavaSpringControllerFilter().doFilter(clazz)) {
+            return JavaType.SPRING_JAVA;
+        } else if (new JavaCommonClassFilter().doFilter(clazz)) {
+            return JavaType.COMMON_JAVA;
+        } else {
+            return JavaType.UNKNOWN;
+        }
     }
 
 
