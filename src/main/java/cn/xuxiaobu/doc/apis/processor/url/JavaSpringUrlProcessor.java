@@ -3,8 +3,8 @@ package cn.xuxiaobu.doc.apis.processor.url;
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import cn.xuxiaobu.doc.exceptions.ProcessApiDefinitionException;
+import cn.xuxiaobu.doc.util.processor.ProcessorUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,31 +76,30 @@ public class JavaSpringUrlProcessor implements ApiUrlDefinitionProcessor {
 
 
     private Map<String, List<String>> getUrlAndSupportedMethod(RequestMapping requestMapping) {
-        Map map = new HashMap(2);
         String[] subUrl = Optional.ofNullable(requestMapping).map(r -> ArrayUtils.addAll(r.value(), r.path())).get();
-        List<String> subUrlList = Stream.of(subUrl).map(m -> StringUtils.startsWith(m, "/") || m.isEmpty() ? m : "/" + m).collect(Collectors.toList());
+        List<String> subUrlList = Stream.of(subUrl).map(m -> ProcessorUtils.urlFormat(m)).collect(Collectors.toList());
         List<String> supportMethod = Stream.of(requestMapping.method()).map(m -> m.name()).collect(Collectors.toList());
-        map.put(urlKey, subUrlList);
-        map.put(methodKey, supportMethod);
-        return map;
+        return doGetMap(supportMethod, subUrlList);
     }
 
 
     private Map<String, List<String>> getUrlAndSupportedMethod(PostMapping postMapping) {
-        Map map = new HashMap(2);
         String[] subUrl = Optional.ofNullable(postMapping).map(r -> ArrayUtils.addAll(r.value(), r.path())).get();
-        List<String> subUrlList = Stream.of(subUrl).map(m -> StringUtils.startsWith(m, "/") || m.isEmpty() ? m : "/" + m).collect(Collectors.toList());
+        List<String> subUrlList = Stream.of(subUrl).map(m -> ProcessorUtils.urlFormat(m)).collect(Collectors.toList());
         List<String> supportMethod = Stream.of(RequestMethod.POST.name()).collect(Collectors.toList());
-        map.put(urlKey, subUrlList);
-        map.put(methodKey, supportMethod);
-        return map;
+        return doGetMap(supportMethod, subUrlList);
     }
 
     private Map<String, List<String>> getUrlAndSupportedMethod(GetMapping getMapping) {
-        Map map = new HashMap(2);
         String[] subUrl = Optional.ofNullable(getMapping).map(r -> ArrayUtils.addAll(r.value(), r.path())).get();
-        List<String> subUrlList = Stream.of(subUrl).map(m -> StringUtils.startsWith(m, "/") || m.isEmpty() ? m : "/" + m).collect(Collectors.toList());
+        List<String> subUrlList = Stream.of(subUrl).map(m -> ProcessorUtils.urlFormat(m)).collect(Collectors.toList());
         List<String> supportMethod = Stream.of(RequestMethod.GET.name()).collect(Collectors.toList());
+        return doGetMap(supportMethod, subUrlList);
+    }
+
+
+    private Map<String, List<String>> doGetMap(List<String> supportMethod,List<String> subUrlList){
+        Map map = new HashMap(2);
         map.put(urlKey, subUrlList);
         map.put(methodKey, supportMethod);
         return map;

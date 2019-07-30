@@ -3,7 +3,7 @@ package cn.xuxiaobu.doc.apis.processor.url;
 import cn.xuxiaobu.doc.apis.annotions.Apis;
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
-import cn.xuxiaobu.doc.apis.processor.ProcessorUtils;
+import cn.xuxiaobu.doc.util.processor.ProcessorUtils;
 import com.alibaba.fastjson.JSON;
 
 import java.lang.annotation.Annotation;

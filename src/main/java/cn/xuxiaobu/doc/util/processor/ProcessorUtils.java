@@ -1,4 +1,4 @@
-package cn.xuxiaobu.doc.apis.processor;
+package cn.xuxiaobu.doc.util.processor;
 
 import org.apache.commons.lang3.StringUtils;
 
