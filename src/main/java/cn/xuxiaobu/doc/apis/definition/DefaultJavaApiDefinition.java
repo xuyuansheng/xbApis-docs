@@ -18,6 +18,15 @@ import java.util.List;
 @Accessors(chain = true)
 public class DefaultJavaApiDefinition implements ApiDefinition {
 
+
+    public DefaultJavaApiDefinition() {
+        /* 默认值 */
+        this.protocol = "http";
+        this.host = "localhost";
+        this.port= "80";
+        this.description = "";
+    }
+
     /**
      * API所属于的类元数据
      */
@@ -39,15 +48,15 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
     /**
      * 协议
      */
-    private String protocol = "http";
+    private String protocol;
     /**
      * 域名
      */
-    private String host = "localhost";
+    private String host;
     /**
      * 端口
      */
-    private String port = "80";
+    private String port;
     /**
      * url,不包含域名和端口
      */

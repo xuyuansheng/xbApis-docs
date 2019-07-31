@@ -2,14 +2,13 @@ package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
-import cn.xuxiaobu.doc.apis.enums.JavaType;
 import cn.xuxiaobu.doc.apis.filter.java.ChainFilterUtils;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaCommonMethodFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaSpringMethodFilter;
-import cn.xuxiaobu.doc.apis.processor.url.JavaCommonUrlProcessor;
-import cn.xuxiaobu.doc.apis.processor.url.JavaSpringUrlProcessor;
+import cn.xuxiaobu.doc.apis.processor.note.JavaApiNoteProcessor;
+import cn.xuxiaobu.doc.apis.processor.url.JavaUrlProcessorSupport;
 import cn.xuxiaobu.doc.config.JavaConfig;
 
 import java.lang.reflect.Method;
@@ -30,12 +29,13 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
     @Override
     protected void apiDefinitionProcess() {
         /* 处理URL和支持的请求方式 */
-        super.apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.SPRING_JAVA)).forEach(dfn -> {
-            new JavaSpringUrlProcessor().postUrlProcess(dfn);
+        JavaUrlProcessorSupport.doUrlProcess(super.apiDefinitions);
+        /* 获取注释信息 */
+        super.apiDefinitions.forEach(def->{
+            new JavaApiNoteProcessor().postNoteProcess(def);
         });
-        super.apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.COMMON_JAVA)).forEach(dfn -> {
-            new JavaCommonUrlProcessor().postUrlProcess(dfn);
-        });
+        /* 处理API描述等注释信息 */
+
     }
 
     @Override
