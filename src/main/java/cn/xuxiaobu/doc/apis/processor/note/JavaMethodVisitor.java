@@ -3,6 +3,7 @@ package cn.xuxiaobu.doc.apis.processor.note;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -25,58 +26,60 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
 
     @Override
     public void visit(CompilationUnit n, DefaultJavaApiDefinition arg) {
+        Class<?> classData = arg.getClazzMateData();
         Method methodData = arg.getMethodMateData();
         String methodName = methodData.getName();
         Integer methodCount = methodData.getParameterCount();
         List<? extends Class<?>> paramsTypeList = Stream.of(methodData.getParameters()).map(parameter -> parameter.getType()).collect(Collectors.toList());
-        /* 通过方法的名称和参数的个数进行初步筛选 */
-        List<MethodDeclaration> methodDeclaration = n.getTypes().stream().filter(td -> td.isMethodDeclaration())
-                .map(tm -> tm.toMethodDeclaration())
-                .filter(md -> md.isPresent())
-                .map(md -> md.get())
-                .filter(mdg -> methodName.equals(mdg.getNameAsString()))
-                .filter(mdg -> methodCount.equals(mdg.getParameters().size()))
-                .collect(Collectors.toList());
-        if (methodDeclaration.size() == 1) {
-            /* 只找到一个,即匹配上 */
-            methodDeclaration.get(0).accept(this, arg);
-            return;
-        }else if(methodDeclaration.size()<1){
-            /* 一个都没找到,方法出错 */
-            throw new RuntimeException("方法匹配出错");
-        }
-        /* 到此,找到了多个方法,且参数个数相同,只能一个个去比较参数的类型是否相同 */
-        List<MethodDeclaration> methodDeclaration3 = methodDeclaration.stream().filter(me -> {
-            NodeList<com.github.javaparser.ast.body.Parameter> params = me.getParameters();
-            for (int i = 0; i < params.size(); i++) {
-                String type = params.get(i).getTypeAsString();
-                boolean flag;
-                if (StringUtils.contains(type, ".")) {
-                    flag = type.equals(paramsTypeList.get(i).getTypeName());
-                } else {
-                    flag = type.equals(paramsTypeList.get(i).getSimpleName());
-                }
-                if (!flag) {
-                    return false;
-                }
+        /* 通过该类名获取到对应的类 */
+        Optional<ClassOrInterfaceDeclaration> optionalCn = n.getClassByName(classData.getSimpleName());
+        if (optionalCn.isPresent()) {
+            /* 通过方法的名称和参数的个数进行初步筛选 */
+            List<MethodDeclaration> methodDeclaration = optionalCn.get().getMethods().stream()
+                    .filter(mdg -> methodName.equals(mdg.getNameAsString()))
+                    .filter(mdg -> methodCount.equals(mdg.getParameters().size()))
+                    .collect(Collectors.toList());
+            if (methodDeclaration.size() == 1) {
+                /* 只找到一个,即匹配上 */
+                methodDeclaration.get(0).accept(this, arg);
+                return;
+            } else if (methodDeclaration.size() < 1) {
+                /* 一个都没找到,方法出错 */
+                throw new RuntimeException("方法匹配出错");
             }
-            return true;
-        }).collect(Collectors.toList());
+            /* 到此,找到了多个方法,且参数个数相同,只能一个个去比较参数的类型是否相同 */
+            List<MethodDeclaration> methodDeclaration3 = methodDeclaration.stream().filter(me -> {
+                NodeList<com.github.javaparser.ast.body.Parameter> params = me.getParameters();
+                for (int i = 0; i < params.size(); i++) {
+                    String type = params.get(i).getTypeAsString();
+                    boolean flag;
+                    if (StringUtils.contains(type, ".")) {
+                        flag = type.equals(paramsTypeList.get(i).getTypeName());
+                    } else {
+                        flag = type.equals(paramsTypeList.get(i).getSimpleName());
+                    }
+                    if (!flag) {
+                        return false;
+                    }
+                }
+                return true;
+            }).collect(Collectors.toList());
 
-        if(methodDeclaration3.size()==1){
-            /* 只找到一个,即匹配上 */
-            methodDeclaration.get(0).accept(this, arg);
-            return;
-        }else if(methodDeclaration3.size()<1){
-            /* 一个都没找到,方法出错 */
-            throw new RuntimeException("方法匹配出错");
+            if (methodDeclaration3.size() == 1) {
+                /* 只找到一个,即匹配上 */
+                methodDeclaration.get(0).accept(this, arg);
+                return;
+            } else if (methodDeclaration3.size() < 1) {
+                /* 一个都没找到,方法出错 */
+                throw new RuntimeException("方法匹配出错");
+            }
+            /* 找到多个时,则表示带全类名的才是正确方法 */
+            Optional<MethodDeclaration> result = methodDeclaration3.stream().filter(mm -> StringUtils.contains(mm.getSignature().asString(), ".")).findFirst();
+            if (result.isPresent()) {
+                result.get().accept(this, arg);
+                return;
+            }
         }
-        /* 找到多个时,则表示带全类名的才是正确方法 */
-        Optional<MethodDeclaration> result = methodDeclaration3.stream().filter(mm -> StringUtils.contains(mm.getSignature().asString(), ".")).findFirst();
-        result.ifPresent(me->{
-            me.accept(this,arg);
-            return ;
-        });
         throw new RuntimeException("方法匹配出错");
     }
 
