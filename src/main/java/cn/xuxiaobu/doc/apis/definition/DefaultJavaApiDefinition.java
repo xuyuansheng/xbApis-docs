@@ -23,8 +23,9 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
         /* 默认值 */
         this.protocol = "http";
         this.host = "localhost";
-        this.port= "80";
+        this.port = "80";
         this.description = "";
+        this.result = new ReturnTypeDefinition();
     }
 
     /**
@@ -76,7 +77,7 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
     /**
      * API结果
      */
-    private Object result;
+    private ReturnTypeDefinition result;
 
     @Override
     public String getAddress(Integer index) {

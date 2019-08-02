@@ -7,10 +7,10 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,52 +91,14 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
         });
     }
 
-    /**
-     * 获取MethodDeclaration的签名,把其中参数类型为全类名的改为简单类名
-     *
-     * @param methodDeclaration 方法
-     * @return 签名结果
-     */
-    private String getSignatureAsString(MethodDeclaration methodDeclaration) {
-        final String dian = ".";
-        String name = methodDeclaration.getSignature().asString();
-        if (StringUtils.contains(name, dian)) {
-            List<String> params = methodDeclaration.getParameters().stream().map(parameter -> parameter.getTypeAsString()).filter(parameter -> StringUtils.contains(parameter, dian)).collect(Collectors.toList());
-            for (String param : params) {
-                List<String> list = Stream.of(StringUtils.split(param, dian)).collect(Collectors.toList());
-                name = name.replace(param, list.get(list.size() - 1));
-            }
-        }
-        return name;
-    }
-
-    /**
-     * 获取方法的格式化,如:method1(String,Integer)或者method1(java.lang.String,Integer)
-     *
-     * @param method       方法
-     * @param ifSimpleName 参数类型是否为简单类型 true:简单类名 ,false:全类名
-     * @return 格式化结果
-     */
-    private String printMethodAsString(Method method, boolean ifSimpleName) {
-        StringBuilder sb = new StringBuilder();
-        String methodName = method.getName();
-        sb.append(methodName).append("(");
-        boolean firstParam = true;
-        Parameter[] params = method.getParameters();
-        for (int i = 0; i < params.length; i++) {
-            if (firstParam) {
-                firstParam = false;
-            } else {
-                sb.append(", ");
-            }
-            if (ifSimpleName) {
-                sb.append(params[i].getType().getSimpleName());
-            } else {
-                sb.append(params[i].getType().getTypeName());
-            }
-        }
-        sb.append(")");
-        return sb.toString();
+    private void  returnTypeAnalysis(MethodDeclaration n, DefaultJavaApiDefinition arg){
+        JavadocBlockTag.Type type = JavadocBlockTag.Type.RETURN;
+        n.getJavadoc().ifPresent(javadoc -> {
+            Optional<JavadocBlockTag> returnBlock = javadoc.getBlockTags().stream().filter(javadocBlockTag -> javadocBlockTag.getType().equals(type)).findFirst();
+            returnBlock.ifPresent(block->{
+                arg.getResult().setRootDescription(block.getContent().toText());
+            });
+        });
     }
 
 }
