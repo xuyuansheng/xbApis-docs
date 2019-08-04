@@ -15,6 +15,38 @@ import java.util.stream.Stream;
  */
 public enum FinalJavaType {
     /**
+     * 基础数据类型
+     */
+    BYTE(byte.class),
+    /**
+     * 基础数据类型
+     */
+    SHORT(short.class),
+    /**
+     * 基础数据类型
+     */
+    INT(int.class),
+    /**
+     * 基础数据类型
+     */
+    LONG(long.class),
+    /**
+     * 基础数据类型
+     */
+    FLOAT(float.class),
+    /**
+     * 基础数据类型
+     */
+    DOUBLE(double.class),
+    /**
+     * 基础数据类型
+     */
+    BOOLEAN(boolean.class),
+    /**
+     * 基础数据类型
+     */
+    CHAR(char.class),
+    /**
      * 集合类
      */
     COLLECTIONS(Collection.class),
@@ -32,7 +64,7 @@ public enum FinalJavaType {
     }
 
     public static boolean exists(Class clazz) {
-        boolean javaClazz = StringUtils.startsWithAny(clazz.getTypeName(), "java.lang", "java.util");
+        boolean javaClazz = StringUtils.startsWithAny(clazz.getTypeName(), "java.");
         if (javaClazz) {
             return true;
         }

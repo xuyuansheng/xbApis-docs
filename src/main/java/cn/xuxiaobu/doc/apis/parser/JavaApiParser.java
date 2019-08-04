@@ -2,7 +2,7 @@ package cn.xuxiaobu.doc.apis.parser;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
-import cn.xuxiaobu.doc.apis.enums.JavaType;
+import cn.xuxiaobu.doc.apis.enums.JavaFrameworkType;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
 import cn.xuxiaobu.doc.apis.initialization.SourceFile;
@@ -30,13 +30,13 @@ public class JavaApiParser implements ApiParser {
     @Override
     public List<ApiDefinition> parse(Class<?> clazz) {
         Resource javaSourceFile = root.getResource(clazz.getName());
-        final JavaType javaType = doGetDefinitionFrom(clazz);
+        final JavaFrameworkType javaFrameworkType = doGetDefinitionFrom(clazz);
         List<ApiDefinition> methods = Stream.of(clazz.getDeclaredMethods())
                 .filter(m -> Modifier.isPublic(m.getModifiers()))
                 .map(m ->
                         new DefaultJavaApiDefinition()
                                 .setClazzMateData(clazz)
-                                .setDefinitionFrom(javaType)
+                                .setDefinitionFrom(javaFrameworkType)
                                 .setMethodMateData(m)
                                 .setJavaFileMateData(javaSourceFile)
                 ).collect(Collectors.toList());
@@ -49,13 +49,13 @@ public class JavaApiParser implements ApiParser {
      * @param clazz
      * @return
      */
-    private JavaType doGetDefinitionFrom(Class<?> clazz) {
+    private JavaFrameworkType doGetDefinitionFrom(Class<?> clazz) {
         if (new JavaSpringControllerFilter().doFilter(clazz)) {
-            return JavaType.SPRING_JAVA;
+            return JavaFrameworkType.SPRING_JAVA;
         } else if (new JavaCommonClassFilter().doFilter(clazz)) {
-            return JavaType.COMMON_JAVA;
+            return JavaFrameworkType.COMMON_JAVA;
         } else {
-            return JavaType.UNKNOWN;
+            return JavaFrameworkType.UNKNOWN;
         }
     }
 

@@ -1,7 +1,9 @@
 package cn.xuxiaobu.doc.apis.processor.returntype;
 
+import cn.xuxiaobu.doc.apis.definition.ReturnTypeDefinition;
 import cn.xuxiaobu.doc.apis.processor.note.TypeWrapper;
 import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
+import com.alibaba.fastjson.JSON;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -17,7 +19,14 @@ import java.util.stream.Stream;
  */
 public class ReturnTypeAnalysis<T> {
 
-    public ReturnTypeAnalysis<String[]>[] parametertype1(String a) {
+
+    private T  t;
+    private String  string;
+    private List<T>  list;
+    private  T[]  ta;
+
+
+    public ReturnTypeAnalysis<ReturnTypeAnalysis<Integer>> parametertype1(String a) {
         return null;
     }
     public List<ReturnTypeAnalysis>[] parametertype(String a) {
@@ -57,11 +66,17 @@ public class ReturnTypeAnalysis<T> {
 
     public static void main(String[] args) throws NoSuchMethodException {
 
+        ReturnTypeDefinition  returnTypeDefinition = new ReturnTypeDefinition();
+
+
+
         ReturnTypeAnalysis returnTypeAnalysis = new ReturnTypeAnalysis();
         Stream.of(ReturnTypeAnalysis.class.getDeclaredMethods()).filter(method -> method.getName().equals("parametertype1")).forEach(method -> {
             Type actualType = method.getGenericReturnType();
-
+            returnTypeDefinition.init(actualType,"heiha");
         });
+        String json = JSON.toJSONString(returnTypeDefinition.getReturnType());
+        System.out.println(json);
         Stream.of(ReturnTypeAnalysis.class.getDeclaredMethods()).filter(method -> method.getName().equals("parametertype")).forEach(method -> {
             Type actualType = method.getGenericReturnType();
             TypeWrapper act = WrapperUtils.getInstance(actualType);

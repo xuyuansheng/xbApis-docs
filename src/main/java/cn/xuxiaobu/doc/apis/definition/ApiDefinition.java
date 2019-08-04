@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc.apis.definition;
 
-import cn.xuxiaobu.doc.apis.enums.JavaType;
+import cn.xuxiaobu.doc.apis.enums.JavaFrameworkType;
 
 import java.util.List;
 
@@ -108,7 +108,7 @@ public interface ApiDefinition {
      *
      * @return
      */
-    JavaType getDefinitionFrom();
+    JavaFrameworkType getDefinitionFrom();
 
     /**
      * 设置API来源数据
@@ -116,6 +116,6 @@ public interface ApiDefinition {
      * @param definitionType
      * @return
      */
-    ApiDefinition setDefinitionFrom(JavaType definitionType);
+    ApiDefinition setDefinitionFrom(JavaFrameworkType definitionType);
 
 }

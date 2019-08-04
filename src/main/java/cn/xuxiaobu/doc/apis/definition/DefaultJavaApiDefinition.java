@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc.apis.definition;
 
-import cn.xuxiaobu.doc.apis.enums.JavaType;
+import cn.xuxiaobu.doc.apis.enums.JavaFrameworkType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.core.io.Resource;
@@ -45,7 +45,7 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
      * 1.从spring的RequestMapping,PostMapping等注解解析获取
      * 2.从自定义的注解Apis解析获取
      */
-    private JavaType definitionFrom;
+    private JavaFrameworkType definitionFrom;
     /**
      * 协议
      */

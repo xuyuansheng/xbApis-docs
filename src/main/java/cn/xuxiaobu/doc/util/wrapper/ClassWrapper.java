@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +31,9 @@ public class ClassWrapper implements TypeWrapper {
     @Override
     public Map<String, TypeWrapper> getFieldsType() {
         Map<String, TypeWrapper> map;
+        if(FinalJavaType.exists(this.type)){
+            return new HashMap<>(0);
+        }
         if (ifArray()) {
             Class<?> arrayComponentType = type.getComponentType();
             map = Stream.of(arrayComponentType.getDeclaredFields()).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));

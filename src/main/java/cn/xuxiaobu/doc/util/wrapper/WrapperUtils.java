@@ -31,7 +31,7 @@ public class WrapperUtils {
            Class actualType = Class.class.cast(type);
            return new ClassWrapper(actualType);
        } else {
-           throw new RuntimeException("不是指定类型");
+           return   new UnKnownTypeWrapper(type);
        }
    }
 

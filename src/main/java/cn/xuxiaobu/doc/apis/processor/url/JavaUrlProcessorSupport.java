@@ -1,7 +1,7 @@
 package cn.xuxiaobu.doc.apis.processor.url;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
-import cn.xuxiaobu.doc.apis.enums.JavaType;
+import cn.xuxiaobu.doc.apis.enums.JavaFrameworkType;
 
 import java.util.List;
 
@@ -15,10 +15,10 @@ public class JavaUrlProcessorSupport {
 
     public static void doUrlProcess(List<ApiDefinition> apiDefinitions){
         /* 处理URL和支持的请求方式 */
-        apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.SPRING_JAVA)).forEach(dfn -> {
+        apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaFrameworkType.SPRING_JAVA)).forEach(dfn -> {
             new JavaSpringUrlProcessor().postUrlProcess(dfn);
         });
-        apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaType.COMMON_JAVA)).forEach(dfn -> {
+        apiDefinitions.stream().filter(k->k.getDefinitionFrom().equals(JavaFrameworkType.COMMON_JAVA)).forEach(dfn -> {
             new JavaCommonUrlProcessor().postUrlProcess(dfn);
         });
     }
