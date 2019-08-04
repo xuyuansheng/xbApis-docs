@@ -2,6 +2,7 @@ package cn.xuxiaobu.doc.apis.processor.note;
 
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
+import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
@@ -14,6 +15,14 @@ import java.io.InputStream;
  * @date 2019-07-30 15:50
  */
 public class JavaApiNoteProcessor implements ApiNoteProcessor {
+
+    private JavaSourceFileContext sourceFileContext;
+
+
+    public JavaApiNoteProcessor(JavaSourceFileContext sourceFileContext) {
+        this.sourceFileContext = sourceFileContext;
+    }
+
     @Override
     public void postNoteProcess(ApiDefinition definition) {
         if (!(definition instanceof DefaultJavaApiDefinition)) {
@@ -30,7 +39,7 @@ public class JavaApiNoteProcessor implements ApiNoteProcessor {
         ParseResult<CompilationUnit> parseResult = new JavaParser().parse(sourceStream);
         CompilationUnit compilationUnit = parseResult.getResult().orElse(new CompilationUnit());
 
-        new JavaMethodVisitor().visit(compilationUnit, defaultJavaApiDefinition);
+        new JavaMethodVisitor(this.sourceFileContext).visit(compilationUnit, defaultJavaApiDefinition);
 
         try {
             sourceStream.close();

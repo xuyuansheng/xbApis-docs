@@ -1,16 +1,18 @@
 package cn.xuxiaobu.doc.apis.processor.note;
 
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
+import cn.xuxiaobu.doc.apis.definition.ReturnTypeDefinition;
+import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +25,13 @@ import java.util.stream.Stream;
  * @date 2019-07-31 09:47
  */
 public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefinition> {
+
+
+    private JavaSourceFileContext sourceFileContext;
+
+    public JavaMethodVisitor(JavaSourceFileContext sourceFileContext) {
+        this.sourceFileContext = sourceFileContext;
+    }
 
     @Override
     public void visit(CompilationUnit n, DefaultJavaApiDefinition arg) {
@@ -85,20 +94,26 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
 
     @Override
     public void visit(MethodDeclaration n, DefaultJavaApiDefinition arg) {
-        SimpleName methodName = n.getName();
-        n.getJavadoc().ifPresent(javadoc -> {
-            arg.setDescription(javadoc.getDescription().toText());
-        });
+        Type type = arg.getMethodMateData().getGenericReturnType();
+        ReturnTypeDefinition returnTypeDefinition = arg.getReturnTypeDefinition();
+        returnTypeDefinition.init(type,getReturnTypeDesc(n));
     }
 
-    private void  returnTypeAnalysis(MethodDeclaration n, DefaultJavaApiDefinition arg){
+    /**
+     * 获取方法返回的注释
+     *
+     * @param n 方法的源码解析对象
+     */
+    private String getReturnTypeDesc(MethodDeclaration n) {
         JavadocBlockTag.Type type = JavadocBlockTag.Type.RETURN;
+        StringBuilder result = new StringBuilder();
         n.getJavadoc().ifPresent(javadoc -> {
             Optional<JavadocBlockTag> returnBlock = javadoc.getBlockTags().stream().filter(javadocBlockTag -> javadocBlockTag.getType().equals(type)).findFirst();
-            returnBlock.ifPresent(block->{
-                arg.getResult().setRootDescription(block.getContent().toText());
+            returnBlock.ifPresent(block -> {
+                result.append(block.getContent().toText());
             });
         });
+        return result.toString();
     }
 
 }

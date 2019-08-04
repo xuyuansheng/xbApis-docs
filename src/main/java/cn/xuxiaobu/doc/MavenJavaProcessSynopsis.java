@@ -32,7 +32,7 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
         JavaUrlProcessorSupport.doUrlProcess(super.apiDefinitions);
         /* 获取注释信息 */
         super.apiDefinitions.forEach(def->{
-            new JavaApiNoteProcessor().postNoteProcess(def);
+            new JavaApiNoteProcessor(super.javaDependencySourceFileContext).postNoteProcess(def);
         });
         /* 处理API描述等注释信息 */
 
