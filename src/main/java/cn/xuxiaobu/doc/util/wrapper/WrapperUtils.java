@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
-import cn.xuxiaobu.doc.apis.processor.note.TypeWrapper;
+import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 
 import java.lang.reflect.*;
 

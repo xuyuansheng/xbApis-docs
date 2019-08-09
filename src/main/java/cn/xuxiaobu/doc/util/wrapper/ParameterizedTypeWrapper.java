@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
-import cn.xuxiaobu.doc.apis.processor.note.TypeWrapper;
+import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -50,6 +50,8 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
         result.append(">");
         return StringUtils.replace(result.toString(), ",>", ">");
     }
+
+
 
     @Override
     public String getTypeName() {

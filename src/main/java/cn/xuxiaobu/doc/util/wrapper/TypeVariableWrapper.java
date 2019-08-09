@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
-import cn.xuxiaobu.doc.apis.processor.note.TypeWrapper;
+import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -43,6 +43,8 @@ public class TypeVariableWrapper implements TypeWrapper {
     public String getSimpleName() {
         return this.type.getTypeName();
     }
+
+
 
     @Override
     public String getTypeName() {

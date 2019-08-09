@@ -1,6 +1,6 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
-import cn.xuxiaobu.doc.apis.processor.note.TypeWrapper;
+import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -45,6 +45,8 @@ public class GenericArrayTypeWrapper implements TypeWrapper {
         String simple = WrapperUtils.getInstance(this.type.getGenericComponentType()).getSimpleName();
         return simple + "[]";
     }
+
+
 
     @Override
     public String getTypeName() {

@@ -1,7 +1,7 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
+import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.enums.FinalJavaType;
-import cn.xuxiaobu.doc.apis.processor.note.TypeWrapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -58,6 +58,8 @@ public class ClassWrapper implements TypeWrapper {
     public String getSimpleName() {
         return this.type.getSimpleName();
     }
+
+
 
     @Override
     public String getTypeName() {
