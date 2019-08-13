@@ -1,13 +1,22 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
+import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.enums.FinalJavaType;
+import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
+import cn.xuxiaobu.doc.apis.processor.note.JavaFieldsVisitor;
+import cn.xuxiaobu.doc.util.processor.GenericityUtils;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.core.io.Resource;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,23 +33,61 @@ public class ClassWrapper implements TypeWrapper {
 
     private Class<?> type;
 
+
     public ClassWrapper(Class<?> type) {
         this.type = type;
     }
 
     @Override
+    public String getCompleteClassName() {
+        return this.type.getTypeName();
+    }
+
+    @Override
     public Map<String, TypeWrapper> getFieldsType() {
         Map<String, TypeWrapper> map;
-        if(FinalJavaType.exists(this.type)){
+        if (FinalJavaType.exists(this.type)) {
             return new HashMap<>(0);
         }
         if (ifArray()) {
             Class<?> arrayComponentType = type.getComponentType();
-            map = Stream.of(arrayComponentType.getDeclaredFields()).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));
+            map = Stream.of(arrayComponentType.getDeclaredFields()).filter(field -> !field.getType().equals(arrayComponentType)).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));
         } else {
-            map = Stream.of(type.getDeclaredFields()).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));
+            map = Stream.of(type.getDeclaredFields()).filter(field -> !field.getType().equals(type)).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));
         }
         return map;
+    }
+
+    @Override
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+
+        Class realType = this.type;
+        Field[] fields = realType.getDeclaredFields();
+        List<TypeShowDefinition> fieldsDef = Stream.of(fields).map(field -> {
+            Type fGenericType = field.getGenericType();
+            ClassOrInterfaceDeclaration clazz = GenericityUtils.getClassOrInterfaceDeclaration(this.type.getName());
+            return WrapperUtils.getInstance(fGenericType).getFieldTypeShowDefinition(field.getName(), clazz, new HashMap<>(0));
+        }).collect(Collectors.toList());
+        return fieldsDef;
+    }
+
+    @Override
+    public TypeShowDefinition getFieldTypeShowDefinition(String name, ClassOrInterfaceDeclaration parentClazz, Map<String, Type> genericitys) {
+
+        TypeShowDefinition def = new TypeShowDefinition()
+                .setName(name)
+                .setCompleteTypeShow(this.getTypeName())
+                .setReturnTypeShow(this.getSimpleName())
+                .setIfCollection(this.ifArrayOrCollection())
+                .setBelongsToClassName(this.getCompleteClassName());
+        /*  相当于执行了这两个操作 .setDefaultValue("")  .setDescription("") */
+        new JavaFieldsVisitor().visit(parentClazz, def);
+
+        if (!this.ifFinalType()) {
+            /* class没有泛型,所以getFieldsTypeShowDefinition 的参数为空map */
+            def.setFields(WrapperUtils.getInstance(this.type).getFieldsTypeShowDefinition(new HashMap<>(0)));
+        }
+        return def;
     }
 
     @Override
@@ -58,7 +105,6 @@ public class ClassWrapper implements TypeWrapper {
     public String getSimpleName() {
         return this.type.getSimpleName();
     }
-
 
 
     @Override

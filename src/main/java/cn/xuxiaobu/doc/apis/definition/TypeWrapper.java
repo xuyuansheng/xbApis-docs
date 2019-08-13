@@ -1,5 +1,7 @@
 package cn.xuxiaobu.doc.apis.definition;
 
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,12 @@ import java.util.Map;
  * @create: 2019/8/4 8:14
  */
 public interface TypeWrapper extends Type {
+ /**
+  * 获取目标类
+  * @return
+  */
+ String getCompleteClassName();
+
     /**
      * 获取所有field的类型
      *
@@ -18,6 +26,21 @@ public interface TypeWrapper extends Type {
      */
     Map<String, TypeWrapper> getFieldsType();
 
+   /**
+    * 获取类型的字段信息
+    * @param genericitys 如果字段中有泛型时会用上的参数
+    * @return  类型内部字段的信息定义
+    */
+    List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys);
+
+   /**
+    * 获取字段的本身的信息
+    * @param name  字段名
+    * @param parentClazz  字段所属的java类源码解析树
+    * @param genericitys  泛型参数,如果字段本身是 GenericArrayType,TypeVariable 可能会替换为实际的类型
+    * @return 字段本身的信息定义
+    */
+    TypeShowDefinition getFieldTypeShowDefinition(String name, ClassOrInterfaceDeclaration parentClazz, Map<String, Type> genericitys);
     /**
      * 是否为数组
      *
@@ -53,13 +76,6 @@ public interface TypeWrapper extends Type {
      */
     String getSimpleName();
 
-    /**
-     * 接收访问器,对其进行解析,得到想要的数据格式
-     * @param analysis
-     * @return
-     */
-    default List<TypeDefinition> accept(TypeAnalysis analysis) {
-       return analysis.visit(this);
-    }
+
 
 }

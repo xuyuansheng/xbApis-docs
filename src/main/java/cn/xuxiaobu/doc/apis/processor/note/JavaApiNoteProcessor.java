@@ -40,7 +40,6 @@ public class JavaApiNoteProcessor implements ApiNoteProcessor {
         CompilationUnit compilationUnit = parseResult.getResult().orElse(new CompilationUnit());
 
         new JavaMethodVisitor(this.sourceFileContext).visit(compilationUnit, defaultJavaApiDefinition);
-
         try {
             sourceStream.close();
         } catch (IOException e) {

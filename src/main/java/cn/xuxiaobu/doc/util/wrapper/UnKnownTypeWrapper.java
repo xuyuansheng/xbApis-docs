@@ -1,9 +1,12 @@
 package cn.xuxiaobu.doc.util.wrapper;
 
+import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,8 +24,28 @@ public class UnKnownTypeWrapper implements TypeWrapper {
     }
 
     @Override
+    public String getCompleteClassName() {
+        return  this.type.getTypeName();
+    }
+
+    @Override
     public Map<String, TypeWrapper> getFieldsType() {
         return new HashMap<>(0);
+    }
+
+    @Override
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+        return null;
+    }
+
+    @Override
+    public TypeShowDefinition getFieldTypeShowDefinition(String name, ClassOrInterfaceDeclaration parentClazz, Map<String, Type> genericitys) {
+        return  new TypeShowDefinition()
+                .setName(name)
+                .setCompleteTypeShow(type.getTypeName())
+                .setReturnTypeShow(type.getTypeName())
+                .setIfCollection(false)
+                .setBelongsToClassName(type.getTypeName());
     }
 
     @Override

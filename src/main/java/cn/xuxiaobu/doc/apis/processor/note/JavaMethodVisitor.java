@@ -96,7 +96,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
     public void visit(MethodDeclaration n, DefaultJavaApiDefinition arg) {
         Type type = arg.getMethodMateData().getGenericReturnType();
         ReturnTypeDefinition returnTypeDefinition = arg.getReturnTypeDefinition();
-        returnTypeDefinition.init(type,getReturnTypeDesc(n));
+        returnTypeDefinition.init(type,getReturnTypeDesc(n),sourceFileContext);
     }
 
     /**
