@@ -2,12 +2,20 @@ package cn.xuxiaobu.doc.apis.definition;
 
 
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
+import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 返回类型的显示结构定义
@@ -25,6 +33,22 @@ public class ReturnTypeDefinition {
 
 
     public void init(Type returnType, String description, JavaSourceFileContext sourceFileContext) {
+        if (returnType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = ParameterizedType.class.cast(returnType);
+            Class rawType = Class.class.cast(parameterizedType.getRawType());
+            String index = rawType.getName();
+            String name = rawType.getSimpleName();
+            try {
+                ParseResult<CompilationUnit> parseUnit = new JavaParser().parse(sourceFileContext.getResource(index).getInputStream());
+                ClassOrInterfaceDeclaration clazzUnit = parseUnit.getResult().orElse(new CompilationUnit()).getClassByName(name).orElse(new ClassOrInterfaceDeclaration());
+                /* 获取到泛型和对应实际类型的对应关系 */
+                Map<String, Type> genericity = GenericityUtils.getMethodTypeGenericity(clazzUnit, parameterizedType);
+                /* 把泛型替换为实际的类型(虽然里面也有可能包含泛型) */
+                returnType = GenericityUtils.genericityReplace(parameterizedType, genericity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         TypeWrapper realType = WrapperUtils.getInstance(returnType);
         this.returnType = realType;
         this.description = description;
@@ -53,6 +77,7 @@ public class ReturnTypeDefinition {
 
     /**
      * 获取method本身的注释
+     *
      * @return
      */
     private TypeShowDefinition getTypeShowDefinition(JavaSourceFileContext sourceFileContext) {
@@ -63,9 +88,8 @@ public class ReturnTypeDefinition {
                 .setDefaultValue("")
                 .setDescription(this.description)
                 .setIfCollection(returnType.ifArrayOrCollection())
-                .setBelongsToClassName(returnType.getCompleteClassName())
-                ;
-        if(!this.returnType.ifFinalType()){
+                .setBelongsToClassName(returnType.getCompleteClassName());
+        if (!this.returnType.ifFinalType()) {
             typeShowDefinition.setFields(returnType.getFieldsTypeShowDefinition(new HashMap<>(0)));
         }
         return typeShowDefinition;
@@ -144,7 +168,6 @@ public class ReturnTypeDefinition {
 //        }
 //        return null;
 //    }
-
 
 
 }
