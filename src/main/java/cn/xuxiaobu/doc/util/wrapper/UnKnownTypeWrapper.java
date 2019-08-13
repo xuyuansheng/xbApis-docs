@@ -34,7 +34,7 @@ public class UnKnownTypeWrapper implements TypeWrapper {
     }
 
     @Override
-    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition() {
         return null;
     }
 

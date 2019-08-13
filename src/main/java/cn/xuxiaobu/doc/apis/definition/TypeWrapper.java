@@ -28,10 +28,9 @@ public interface TypeWrapper extends Type {
 
    /**
     * 获取类型的字段信息
-    * @param genericitys 如果字段中有泛型时会用上的参数
     * @return  类型内部字段的信息定义
     */
-    List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys);
+    List<TypeShowDefinition> getFieldsTypeShowDefinition();
 
    /**
     * 获取字段的本身的信息

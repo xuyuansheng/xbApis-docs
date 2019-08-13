@@ -3,17 +3,14 @@ package cn.xuxiaobu.doc.util.wrapper;
 import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.enums.FinalJavaType;
-import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.apis.processor.note.JavaFieldsVisitor;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.core.io.Resource;
 
-import java.lang.reflect.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +56,7 @@ public class ClassWrapper implements TypeWrapper {
     }
 
     @Override
-    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition() {
 
         Class realType = this.type;
         Field[] fields = realType.getDeclaredFields();
@@ -85,7 +82,7 @@ public class ClassWrapper implements TypeWrapper {
 
         if (!this.ifFinalType()) {
             /* class没有泛型,所以getFieldsTypeShowDefinition 的参数为空map */
-            def.setFields(WrapperUtils.getInstance(this.type).getFieldsTypeShowDefinition(new HashMap<>(0)));
+            def.setFields(WrapperUtils.getInstance(this.type).getFieldsTypeShowDefinition());
         }
         return def;
     }

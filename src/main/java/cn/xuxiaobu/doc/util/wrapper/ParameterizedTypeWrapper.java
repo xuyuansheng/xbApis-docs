@@ -2,18 +2,14 @@ package cn.xuxiaobu.doc.util.wrapper;
 
 import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
-import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.apis.processor.note.JavaFieldsVisitor;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.Resource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,13 +60,15 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
     }
 
     @Override
-    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition() {
         ParameterizedType realType = this.type;
         Class<?> rawType = Class.class.cast(realType.getRawType());
         Field[] fields = rawType.getDeclaredFields();
+        ClassOrInterfaceDeclaration parentClazzUnit = GenericityUtils.getClassOrInterfaceDeclaration(rawType.getTypeName());
         List<TypeShowDefinition> fieldsDef = Stream.of(fields).map(field -> {
             Type fGenericType = field.getGenericType();
-            return WrapperUtils.getInstance(fGenericType).getFieldTypeShowDefinition(field.getName(), GenericityUtils.getClassOrInterfaceDeclaration(this.type.getRawType().getTypeName()), genericitys);
+            Map<String, Type> map = GenericityUtils.getMethodTypeGenericity(parentClazzUnit, realType);
+            return WrapperUtils.getInstance(fGenericType).getFieldTypeShowDefinition(field.getName(),parentClazzUnit,map);
         }).collect(Collectors.toList());
         return fieldsDef;
     }
@@ -88,8 +86,7 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
         new JavaFieldsVisitor().visit(parentClazz, def);
 
         if (!this.ifFinalType()) {
-            genericitys = GenericityUtils.getTypeParamters(GenericityUtils.getClassOrInterfaceDeclaration(this.type.getRawType().getTypeName()), this.type,genericitys);
-            def.setFields(this.getFieldsTypeShowDefinition(genericitys));
+            def.setFields(this.getFieldsTypeShowDefinition());
         }
         return def;
     }

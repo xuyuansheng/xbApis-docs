@@ -14,7 +14,6 @@ import lombok.experimental.Accessors;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -53,7 +52,7 @@ public class ReturnTypeDefinition {
         this.returnType = realType;
         this.description = description;
         this.ifCollection = realType.ifArray();
-        this.typeShowDefinition = getTypeShowDefinition(sourceFileContext);
+        this.typeShowDefinition = getTypeShowDefinition();
     }
 
 
@@ -80,7 +79,7 @@ public class ReturnTypeDefinition {
      *
      * @return
      */
-    private TypeShowDefinition getTypeShowDefinition(JavaSourceFileContext sourceFileContext) {
+    private TypeShowDefinition getTypeShowDefinition() {
         TypeShowDefinition typeShowDefinition = new TypeShowDefinition()
                 .setName("result")
                 .setCompleteTypeShow(returnType.getTypeName())
@@ -90,7 +89,7 @@ public class ReturnTypeDefinition {
                 .setIfCollection(returnType.ifArrayOrCollection())
                 .setBelongsToClassName(returnType.getCompleteClassName());
         if (!this.returnType.ifFinalType()) {
-            typeShowDefinition.setFields(returnType.getFieldsTypeShowDefinition(new HashMap<>(0)));
+            typeShowDefinition.setFields(returnType.getFieldsTypeShowDefinition());
         }
         return typeShowDefinition;
     }

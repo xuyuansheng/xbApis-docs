@@ -3,7 +3,6 @@ package cn.xuxiaobu.doc.util.wrapper;
 import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.processor.note.JavaFieldsVisitor;
-import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -11,9 +10,6 @@ import lombok.experimental.Accessors;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +42,7 @@ public class GenericArrayTypeWrapper implements TypeWrapper {
     }
 
     @Override
-    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition() {
         /* 实际情况进不来此方法,即使进来了也是返回null */
         return null;
     }
@@ -74,7 +70,7 @@ public class GenericArrayTypeWrapper implements TypeWrapper {
 
         if (!realType.ifFinalType()) {
             /* class没有泛型,所以getFieldsTypeShowDefinition 的参数为空map */
-            def.setFields(WrapperUtils.getInstance(realType).getFieldsTypeShowDefinition(new HashMap<>(0)));
+            def.setFields(WrapperUtils.getInstance(realType).getFieldsTypeShowDefinition());
         }
         return def;
     }

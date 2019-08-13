@@ -41,7 +41,7 @@ public class TypeVariableWrapper implements TypeWrapper {
     }
 
     @Override
-    public List<TypeShowDefinition> getFieldsTypeShowDefinition(Map<String, Type> genericitys) {
+    public List<TypeShowDefinition> getFieldsTypeShowDefinition() {
         /* 实际情况进不来此方法,即使进来了也是返回null */
         return null;
     }
@@ -70,7 +70,7 @@ public class TypeVariableWrapper implements TypeWrapper {
 
         if (!realType.ifFinalType()) {
             /* class没有泛型,所以getFieldsTypeShowDefinition 的参数为空map */
-            def.setFields(WrapperUtils.getInstance(realType).getFieldsTypeShowDefinition(new HashMap<>(0)));
+            def.setFields(WrapperUtils.getInstance(realType).getFieldsTypeShowDefinition());
         }
         return def;
     }
