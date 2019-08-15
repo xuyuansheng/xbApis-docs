@@ -33,12 +33,11 @@ public class ReturnTypeDefinition {
     }
 
 
-    public void init(Type returnType, String description, JavaSourceFileContext sourceFileContext) {
+    public void init(Type returnType, String returnDescription) {
         if (returnType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = ParameterizedType.class.cast(returnType);
             Class rawType = Class.class.cast(parameterizedType.getRawType());
             String index = rawType.getName();
-            String name = rawType.getSimpleName();
 
             ClassOrInterfaceDeclaration clazzUnit = GenericityUtils.getClassOrInterfaceDeclaration(index);
             /* 获取到泛型和对应实际类型的对应关系 */
@@ -49,7 +48,7 @@ public class ReturnTypeDefinition {
         }
         TypeWrapper realType = WrapperUtils.getInstance(returnType);
         this.returnType = realType;
-        this.description = description;
+        this.description = returnDescription;
         this.ifCollection = realType.ifArray();
         this.typeShowDefinition = getTypeShowDefinition();
     }
@@ -74,7 +73,7 @@ public class ReturnTypeDefinition {
     private TypeShowDefinition typeShowDefinition;
 
     /**
-     * 获取method本身的注释
+     * 获取method本身返回类型的注释
      *
      * @return
      */

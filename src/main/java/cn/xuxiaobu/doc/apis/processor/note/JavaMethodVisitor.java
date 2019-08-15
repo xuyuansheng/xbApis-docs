@@ -56,7 +56,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return;
             } else if (methodDeclaration.size() < 1) {
                 /* 一个都没找到,方法出错 */
-                log.info("方法匹配出错,类={}\n方法={}\n解析树={}",classData,methodData,n);
+                log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
             }
             /* 到此,找到了多个方法,且参数个数相同,只能一个个去比较参数的类型是否相同 */
             List<MethodDeclaration> methodDeclaration3 = methodDeclaration.stream().filter(me -> {
@@ -82,7 +82,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return;
             } else if (methodDeclaration3.size() < 1) {
                 /* 一个都没找到,方法出错 */
-                log.info("方法匹配出错,类={}\n方法={}\n解析树={}",classData,methodData,n);
+                log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
             }
             /* 找到多个时,则表示带全类名的才是正确方法 */
             Optional<MethodDeclaration> result = methodDeclaration3.stream().filter(mm -> StringUtils.contains(mm.getSignature().asString(), ".")).findFirst();
@@ -91,29 +91,38 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return;
             }
         }
-        log.info("方法匹配出错,类={}\n方法={}\n解析树={}",classData,methodData,n);
+        log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
     }
 
     @Override
     public void visit(MethodDeclaration n, DefaultJavaApiDefinition arg) {
         Type type = arg.getMethodMateData().getGenericReturnType();
         ReturnTypeDefinition returnTypeDefinition = arg.getReturnTypeDefinition();
-        returnTypeDefinition.init(type,getReturnTypeDesc(n),sourceFileContext);
+        arg.setDescription(getDescription(n, false));
+        returnTypeDefinition.init(type, getDescription(n, true));
     }
 
     /**
-     * 获取方法返回的注释
+     * 获取方法的描述,而不是方法返回的描述,如:(@return 方法返回值的描述)
      *
-     * @param n 方法的源码解析对象
+     * @param n        方法的源码解析对象
+     * @param ifReturn true:获取方法返回的注释 , false:获取方法的注释
+     * @return
      */
-    private String getReturnTypeDesc(MethodDeclaration n) {
+    private String getDescription(MethodDeclaration n, boolean ifReturn) {
         JavadocBlockTag.Type type = JavadocBlockTag.Type.RETURN;
         StringBuilder result = new StringBuilder();
         n.getJavadoc().ifPresent(javadoc -> {
-            Optional<JavadocBlockTag> returnBlock = javadoc.getBlockTags().stream().filter(javadocBlockTag -> javadocBlockTag.getType().equals(type)).findFirst();
-            returnBlock.ifPresent(block -> {
-                result.append(block.getContent().toText());
-            });
+            if (ifReturn) {
+                /* 方法返回值描述 @return 方法返回值的描述 */
+                Optional<JavadocBlockTag> returnBlock = javadoc.getBlockTags().stream().filter(javadocBlockTag -> javadocBlockTag.getType().equals(type)).findFirst();
+                returnBlock.ifPresent(block -> {
+                    result.append(block.getContent().toText());
+                });
+            } else {
+                String methodDescription = javadoc.getDescription().toText();
+                result.append(methodDescription);
+            }
         });
         return result.toString();
     }
