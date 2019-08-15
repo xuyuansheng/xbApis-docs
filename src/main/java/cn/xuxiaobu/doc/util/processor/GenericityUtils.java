@@ -24,6 +24,14 @@ import java.util.stream.Stream;
  */
 public class GenericityUtils {
 
+    /**
+     * java源码文件环境
+     */
+    private static JavaSourceFileContext javaSourceFileContext = null;
+
+    public static void setJavaSourceFileContext(JavaSourceFileContext javaSourceFileContext) {
+        GenericityUtils.javaSourceFileContext = javaSourceFileContext;
+    }
 
     /**
      * 通过路径获取到类的解析树
@@ -33,7 +41,6 @@ public class GenericityUtils {
      */
     public static ClassOrInterfaceDeclaration getClassOrInterfaceDeclaration(String className) {
 
-        JavaSourceFileContext javaSourceFileContext = new JavaSourceFileContext(null, null);
 
         try {
             ParseResult<CompilationUnit> parseResult = new JavaParser().parse(javaSourceFileContext.getResource(className).getInputStream());
@@ -88,6 +95,7 @@ public class GenericityUtils {
 
     /**
      * 获取方法返回的类型中泛型的对应
+     *
      * @param clazz 方法所属类的解析树
      * @param type  方法的返回类型 通过 getGenericReturnType 方法获得
      * @return 方法类的泛型和实际类的对应关系

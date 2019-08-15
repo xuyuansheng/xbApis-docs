@@ -70,7 +70,7 @@ public class TypeVariableWrapper implements TypeWrapper {
 
         if (!realType.ifFinalType()) {
             /* class没有泛型,所以getFieldsTypeShowDefinition 的参数为空map */
-            def.setFields(WrapperUtils.getInstance(realType).getFieldsTypeShowDefinition());
+            def.setFields(realType.getFieldsTypeShowDefinition());
         }
         return def;
     }

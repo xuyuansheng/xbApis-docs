@@ -7,6 +7,7 @@ import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.config.JavaConfig;
+import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -98,6 +99,8 @@ public abstract class AbstractJavaProcessSynopsis {
             }
         }).filter(n->n!=null).collect(Collectors.toList());
         this.javaDependencySourceFileContext = new JavaSourceFileContext(new JavaFileInitializationSupport(), urls);
+        /* 把源码文件赋值到util类中,可以全局使用 */
+        GenericityUtils.setJavaSourceFileContext(this.javaDependencySourceFileContext);
     }
 
     protected void loadDependencyClassSource() {
