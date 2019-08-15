@@ -1,5 +1,7 @@
 package cn.xuxiaobu.doc.apis.annotions;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +16,7 @@ import java.util.stream.Stream;
  * @author 020102
  * @date 2019-07-30 13:18
  */
+@Slf4j
 public class JdkDynamicProxy implements InvocationHandler {
 
     public JdkDynamicProxy(Annotation target) {
@@ -34,9 +37,11 @@ public class JdkDynamicProxy implements InvocationHandler {
                 return methodT.get().invoke(target, args);
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.error("代理执行参数不对  ",e);
+            log.info("代理执行参数不对 ,{}",methodT);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.error("代理执行失败  ",e);
+            log.info("代理执行失败 ,{}",methodT);
         }
         return null;
     }

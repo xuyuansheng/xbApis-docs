@@ -1,6 +1,8 @@
 package cn.xuxiaobu.doc.apis.initialization;
 
+import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.resource.JarInnerFileResource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.FileSystemResource;
 
@@ -20,6 +22,7 @@ import java.util.jar.JarFile;
  * @author 020102
  * @date 2019-07-18 10:01
  */
+@Slf4j
 public class JavaFileInitializationSupport  {
     /**
      * 文件后缀
@@ -67,7 +70,8 @@ public class JavaFileInitializationSupport  {
                     temp.put(key, new FileSystemResource(f));
                 } else {
                     if (ifFailFast) {
-                        throw new RuntimeException("已经存在相同的文件 :　" + key);
+                        log.info("已经存在相同的文件={} , {}",f.getName(),key);
+                        throw new InitSourceException(f.getName(),"已经存在相同的文件");
                     }
                 }
             } else {
@@ -114,7 +118,8 @@ public class JavaFileInitializationSupport  {
                     temp.put(key, new JarInnerFileResource(jarFile, next));
                 } else {
                     if (ifFailFast) {
-                        throw new RuntimeException("已经存在相同的文件 : " + name);
+                        log.info("已经存在相同的文件={} , {}",source,key);
+                        throw new InitSourceException(source.getPath(),"已经存在相同的文件");
                     }
                 }
 

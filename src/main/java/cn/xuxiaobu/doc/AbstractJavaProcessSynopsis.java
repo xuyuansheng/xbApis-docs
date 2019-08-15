@@ -8,6 +8,7 @@ import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.config.JavaConfig;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
  * @author 020102
  * @date 2019-07-19 09:24
  */
+@Slf4j
 public abstract class AbstractJavaProcessSynopsis {
     /**
      * 环境配置
@@ -86,6 +88,8 @@ public abstract class AbstractJavaProcessSynopsis {
         List<String> source = this.javaConfig.getSourceDependencyJava();
         if (source == null) {
             this.javaDependencySourceFileContext = this.javaSourceFileContext;
+            /* 把源码文件赋值到util类中,可以全局使用 */
+            GenericityUtils.setJavaSourceFileContext(this.javaSourceFileContext);
             return;
         }
         source.add(this.javaConfig.getSourceJavaDir());
@@ -94,7 +98,8 @@ public abstract class AbstractJavaProcessSynopsis {
                 URL sourceFile = new File(s).toURI().toURL();
                 return sourceFile;
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                log.error("转换为URL失败 ",e);
+                log.info("转换为URL失败",s);
                 return null;
             }
         }).filter(n->n!=null).collect(Collectors.toList());
@@ -116,7 +121,8 @@ public abstract class AbstractJavaProcessSynopsis {
                 URL url = new File(s).toURI().toURL();
                 return url;
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                log.error("转换为URL失败 ",e);
+                log.info("转换为URL失败",s);
                 return null;
             }
         }).filter(n->n!=null).collect(Collectors.toList());

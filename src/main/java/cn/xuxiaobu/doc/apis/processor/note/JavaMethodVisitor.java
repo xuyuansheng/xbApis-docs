@@ -9,6 +9,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.javadoc.JavadocBlockTag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
  * @author 020102
  * @date 2019-07-31 09:47
  */
+@Slf4j
 public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefinition> {
 
 
@@ -54,7 +56,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return;
             } else if (methodDeclaration.size() < 1) {
                 /* 一个都没找到,方法出错 */
-                throw new RuntimeException("方法匹配出错");
+                log.info("方法匹配出错,类={}\n方法={}\n解析树={}",classData,methodData,n);
             }
             /* 到此,找到了多个方法,且参数个数相同,只能一个个去比较参数的类型是否相同 */
             List<MethodDeclaration> methodDeclaration3 = methodDeclaration.stream().filter(me -> {
@@ -80,7 +82,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return;
             } else if (methodDeclaration3.size() < 1) {
                 /* 一个都没找到,方法出错 */
-                throw new RuntimeException("方法匹配出错");
+                log.info("方法匹配出错,类={}\n方法={}\n解析树={}",classData,methodData,n);
             }
             /* 找到多个时,则表示带全类名的才是正确方法 */
             Optional<MethodDeclaration> result = methodDeclaration3.stream().filter(mm -> StringUtils.contains(mm.getSignature().asString(), ".")).findFirst();
@@ -89,7 +91,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return;
             }
         }
-        throw new RuntimeException("方法匹配出错");
+        log.info("方法匹配出错,类={}\n方法={}\n解析树={}",classData,methodData,n);
     }
 
     @Override

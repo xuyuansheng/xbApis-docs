@@ -10,6 +10,7 @@ import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaSpringMethodFilter;
 import cn.xuxiaobu.doc.apis.processor.note.JavaApiNoteProcessor;
 import cn.xuxiaobu.doc.apis.processor.url.JavaUrlProcessorSupport;
 import cn.xuxiaobu.doc.config.JavaConfig;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * @author 020102
  * @date 2019-07-19 10:05
  */
+@Slf4j
 public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
 
 
@@ -58,7 +60,8 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
                     try {
                         return urlClassLoader.loadClass(m);
                     } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
+                        log.error("加载不到该类 :",e);
+                        log.info("加载不到该类 :",e.getMessage());
                         return null;
                     }
                 })

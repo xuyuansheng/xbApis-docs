@@ -5,14 +5,13 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import sun.reflect.generics.reflectiveObjects.GenericArrayTypeImpl;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,6 +21,7 @@ import java.util.stream.Stream;
  * @author 020102
  * @date 2019-08-13 09:39
  */
+@Slf4j
 public class GenericityUtils {
 
     /**
@@ -48,7 +48,8 @@ public class GenericityUtils {
             Optional<ClassOrInterfaceDeclaration> clazzSource = compilationUnit.getClassByName(className);
             return clazzSource.orElse(new ClassOrInterfaceDeclaration());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("获取java源码解析树失败 ,className {}",className);
+            log.error("获取java源码解析树失败  ",e);
             return new ClassOrInterfaceDeclaration();
         }
     }
@@ -71,7 +72,7 @@ public class GenericityUtils {
             listActType.stream().filter(t -> t instanceof ParameterizedType).map(t -> {
                 ParameterizedType real = ParameterizedType.class.cast(t);
                 Type[] actTypeArg = real.getActualTypeArguments();
-                Stream.iterate(0, i -> i++).limit(actTypeArg.length).forEach(i -> {
+                Stream.iterate(0, i -> i+1).limit(actTypeArg.length).forEach(i -> {
                     Type act = actTypeArg[i];
                     if (act instanceof TypeVariable) {
                         actTypeArg[i] = genericity.get(act.getTypeName());
@@ -86,9 +87,9 @@ public class GenericityUtils {
         /* 自己的泛型定义列表 GenericityClass<T,R,Y,U> */
         List<String> listTypeParam = clazz.getTypeParameters().stream().map(typeParam -> typeParam.getNameAsString()).collect(Collectors.toList());
         if (listActType.size() != listTypeParam.size()) {
-            throw new RuntimeException("泛型无法匹配");
+            log.info("泛型无法匹配,clazz={} \n type={}",clazz,type);
         }
-        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i++).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v)));
+        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i+1).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v)));
         return selfTypeParameters;
     }
 
@@ -101,14 +102,19 @@ public class GenericityUtils {
      * @return 方法类的泛型和实际类的对应关系
      */
     public static Map<String, Type> getMethodTypeGenericity(ClassOrInterfaceDeclaration clazz, ParameterizedType type) {
-        /*  GenericityClass<? extends List<U>, GenericityTwo<List, U>, U[], U>     */
-        List<Type> listActType = Stream.of(type.getActualTypeArguments()).collect(Collectors.toList());
         /* 自己的泛型定义列表 GenericityClass<T,R,Y,U> */
         List<String> listTypeParam = clazz.getTypeParameters().stream().map(typeParam -> typeParam.getNameAsString()).collect(Collectors.toList());
-        if (listActType.size() != listTypeParam.size()) {
-            throw new RuntimeException("泛型无法匹配");
+        if(listTypeParam.size()==0){
+            log.info("泛型对应关系,clazz={} \n type={}",clazz,type);
+            return new HashMap<>(0);
         }
-        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i++).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v)));
+        /*  GenericityClass<? extends List<U>, GenericityTwo<List, U>, U[], U>     */
+        List<Type> listActType = Stream.of(type.getActualTypeArguments()).collect(Collectors.toList());
+
+        if (listActType.size() != listTypeParam.size()) {
+            log.info("泛型无法匹配,clazz={} \n type={}",clazz,type);
+        }
+        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i+1).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v)));
         return selfTypeParameters;
     }
 

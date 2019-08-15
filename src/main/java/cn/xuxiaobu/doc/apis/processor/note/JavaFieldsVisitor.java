@@ -4,6 +4,8 @@ import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import java.util.Optional;
  * @author: Mr.Xu
  * @create: 2019/8/9 22:29
  */
+@Slf4j
 public class JavaFieldsVisitor extends VoidVisitorAdapter<TypeShowDefinition> {
 
     @Override
@@ -21,7 +24,7 @@ public class JavaFieldsVisitor extends VoidVisitorAdapter<TypeShowDefinition> {
         if (fieldOpt.isPresent()) {
             fieldOpt.get().accept(this, arg);
         } else {
-            throw new RuntimeException("没找到这个字段");
+            log.info("找不到对应的字段,ClassOrInterfaceDeclaration={} \n TypeShowDefinition={}",n,arg);
         }
     }
 

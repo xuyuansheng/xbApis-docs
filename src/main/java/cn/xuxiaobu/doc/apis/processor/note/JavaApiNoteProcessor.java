@@ -6,6 +6,7 @@ import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,7 @@ import java.io.InputStream;
  * @author 020102
  * @date 2019-07-30 15:50
  */
+@Slf4j
 public class JavaApiNoteProcessor implements ApiNoteProcessor {
 
     private JavaSourceFileContext sourceFileContext;
@@ -33,7 +35,8 @@ public class JavaApiNoteProcessor implements ApiNoteProcessor {
         try {
           sourceStream=  defaultJavaApiDefinition.getJavaFileMateData().getInputStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info("没有获取到java源码数据 ,{}",defaultJavaApiDefinition);
+            log.error("没有获取到java源码数据  ",e);
             return;
         }
         ParseResult<CompilationUnit> parseResult = new JavaParser().parse(sourceStream);
@@ -43,7 +46,7 @@ public class JavaApiNoteProcessor implements ApiNoteProcessor {
         try {
             sourceStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("流关闭失败  ",e);
         }
 
     }

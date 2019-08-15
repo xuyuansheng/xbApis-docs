@@ -2,6 +2,7 @@ package cn.xuxiaobu.doc;
 
 import cn.xuxiaobu.doc.apis.initialization.JavaFileInitializationSupport;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -9,6 +10,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 测试
@@ -16,6 +19,7 @@ import java.util.List;
  * @author 020102
  * @date 2019-07-18 13:03
  */
+@Slf4j
 @RequestMapping()
 public class TestApi {
 
@@ -23,7 +27,11 @@ public class TestApi {
     public void test(){
         String[] ap = TestApi.class.getAnnotation(RequestMapping.class).path();
         System.out.println(TestApi.class.getAnnotation(RequestMapping.class).value().length);
-        System.out.println("");
+
+        log.debug("debug",ap);
+        log.warn("warn");
+        log.info("info {}", Stream.of(1,2,3,4).collect(Collectors.toList()));
+        log.error("error");
     }
 
     @Test
