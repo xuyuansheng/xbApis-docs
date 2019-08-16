@@ -63,7 +63,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
             }
             if(typeNameMatched.size()==1){
                 /* 只找到一个,即匹配上 */
-                methodDeclaration.get(0).accept(this, arg);
+                typeNameMatched.get(0).accept(this, arg);
                 return;
             }else if(typeNameMatched.size()<1){
                 /* 一个都没找到,方法出错 */
