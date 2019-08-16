@@ -1,18 +1,14 @@
 package cn.xuxiaobu.doc.apis.definition;
 
 
-import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.ast.CompilationUnit;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -50,13 +46,14 @@ public class ReturnTypeDefinition {
         this.returnType = realType;
         this.description = returnDescription;
         this.ifCollection = realType.ifArray();
-        this.typeShowDefinition = getTypeShowDefinition();
+        this.typeShowDefinition = initTypeShowDefinition();
     }
 
 
     /**
      * 实际的放回类型
      */
+    @JSONField(serialize = false)
     private TypeWrapper returnType;
     /**
      * 返回结果的描述(注意:不是返回类型中各个字段含义的描述,而是对整个返回结果的描述)
@@ -77,7 +74,7 @@ public class ReturnTypeDefinition {
      *
      * @return
      */
-    private TypeShowDefinition getTypeShowDefinition() {
+    private TypeShowDefinition initTypeShowDefinition() {
         TypeShowDefinition typeShowDefinition = new TypeShowDefinition()
                 .setName("result")
                 .setCompleteTypeShow(returnType.getTypeName())

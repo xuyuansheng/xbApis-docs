@@ -8,6 +8,7 @@ import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.config.JavaConfig;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -64,6 +65,8 @@ public abstract class AbstractJavaProcessSynopsis {
         getApiMetadata();
         /* 6.处理API元数据,得到全部的定义 */
         apiDefinitionProcess();
+
+        log.info(JSON.toJSONString(apiDefinitions));
     }
 
     public AbstractJavaProcessSynopsis(JavaConfig javaConfig) {

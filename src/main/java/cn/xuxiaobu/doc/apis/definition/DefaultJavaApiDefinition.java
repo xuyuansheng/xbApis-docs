@@ -1,6 +1,7 @@
 package cn.xuxiaobu.doc.apis.definition;
 
 import cn.xuxiaobu.doc.apis.enums.JavaFrameworkType;
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.core.io.Resource;
@@ -31,14 +32,17 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
     /**
      * API所属于的类元数据
      */
+    @JSONField(serialize = false)
     private Class<?> clazzMateData;
     /**
      * Java源文件,从中提取注释的内容
      */
+    @JSONField(serialize = false)
     private Resource javaFileMateData;
     /**
      * API的方法元数据
      */
+    @JSONField(serialize = false)
     private Method methodMateData;
     /**
      * API的来源类型,
