@@ -4,13 +4,12 @@ import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.ReturnTypeDefinition;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -50,45 +49,29 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                     .filter(mdg -> methodName.equals(mdg.getNameAsString()))
                     .filter(mdg -> methodCount.equals(mdg.getParameters().size()))
                     .collect(Collectors.toList());
-            if (methodDeclaration.size() == 1) {
-                /* 只找到一个,即匹配上 */
-                methodDeclaration.get(0).accept(this, arg);
-                return;
-            } else if (methodDeclaration.size() < 1) {
-                /* 一个都没找到,方法出错 */
-                log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
-            }
-            /* 到此,找到了多个方法,且参数个数相同,只能一个个去比较参数的类型是否相同 */
-            List<MethodDeclaration> methodDeclaration3 = methodDeclaration.stream().filter(me -> {
-                NodeList<com.github.javaparser.ast.body.Parameter> params = me.getParameters();
-                for (int i = 0; i < params.size(); i++) {
-                    String type = params.get(i).getTypeAsString();
-                    boolean flag;
-                    if (StringUtils.contains(type, ".")) {
-                        flag = type.equals(paramsTypeList.get(i).getTypeName());
-                    } else {
-                        flag = type.equals(paramsTypeList.get(i).getSimpleName());
-                    }
-                    if (!flag) {
-                        return false;
-                    }
+            List<MethodDeclaration> typeNameMatched = methodDeclaration;
+            for (int i = 0; i < paramsTypeList.size(); i++) {
+                int finalI = i;
+                /* 匹配第 i 个参数的全类名,找到了表示成功,继续下一个 */
+                List<MethodDeclaration> typeNameMatchedTemp = typeNameMatched.stream().filter(m -> m.getParameter(finalI).getTypeAsString().equals(paramsTypeList.get(finalI).getTypeName())).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(typeNameMatchedTemp)) {
+                    typeNameMatched = typeNameMatchedTemp;
+                    continue;
                 }
-                return true;
-            }).collect(Collectors.toList());
-
-            if (methodDeclaration3.size() == 1) {
+                /* 上面第 i 个参数的全类名没匹配到,则用简单类名simpleName去匹配,找到了继续下一个参数,没找到表示第 i 个参数没匹配到任何方法,查找失败  */
+                typeNameMatched = typeNameMatched.stream().filter(m -> m.getParameter(finalI).getTypeAsString().equals(paramsTypeList.get(finalI).getSimpleName())).collect(Collectors.toList());
+            }
+            if(typeNameMatched.size()==1){
                 /* 只找到一个,即匹配上 */
                 methodDeclaration.get(0).accept(this, arg);
                 return;
-            } else if (methodDeclaration3.size() < 1) {
+            }else if(typeNameMatched.size()<1){
                 /* 一个都没找到,方法出错 */
                 log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
-            }
-            /* 找到多个时,则表示带全类名的才是正确方法 */
-            Optional<MethodDeclaration> result = methodDeclaration3.stream().filter(mm -> StringUtils.contains(mm.getSignature().asString(), ".")).findFirst();
-            if (result.isPresent()) {
-                result.get().accept(this, arg);
-                return;
+            }else {
+                /* 一个都没找到,方法出错 */
+                log.info("方法匹配到多个,取第一个,类={}\n方法={}\n解析树={}", classData, methodData, n);
+                typeNameMatched.get(0).accept(this, arg);
             }
         }
         log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
