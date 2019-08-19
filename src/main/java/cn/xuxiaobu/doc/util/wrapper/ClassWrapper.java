@@ -60,11 +60,19 @@ public class ClassWrapper implements TypeWrapper {
 
         Class realType = this.type;
         Field[] fields = realType.getDeclaredFields();
+        /* 把自己添加到终点类,防止循环解析 */
+        FinalJavaType.add(realType);
         List<TypeShowDefinition> fieldsDef = Stream.of(fields).map(field -> {
             Type fGenericType = field.getGenericType();
             ClassOrInterfaceDeclaration clazz = GenericityUtils.getClassOrInterfaceDeclaration(this.type.getName());
             return WrapperUtils.getInstance(fGenericType).getFieldTypeShowDefinition(field.getName(), clazz, new HashMap<>(0));
         }).collect(Collectors.toList());
+        TypeWrapper superType = WrapperUtils.getInstance(realType.getGenericSuperclass());
+        if(!superType.ifFinalType()){
+            /* 获取父类的属性 */
+            fieldsDef.addAll(superType.getFieldsTypeShowDefinition());
+        }
+        FinalJavaType.remove(realType);
         return fieldsDef;
     }
 

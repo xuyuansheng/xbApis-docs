@@ -2,6 +2,7 @@ package cn.xuxiaobu.doc.util.wrapper;
 
 import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
+import cn.xuxiaobu.doc.apis.enums.FinalJavaType;
 import cn.xuxiaobu.doc.apis.processor.note.JavaFieldsVisitor;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -33,21 +34,21 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
 
     @Override
     public String getCompleteClassName() {
-        return  this.type.getRawType().getTypeName();
+        return this.type.getRawType().getTypeName();
     }
 
     @Override
     public Map<String, TypeWrapper> getFieldsType() {
         Map<String, TypeWrapper> result = WrapperUtils.getInstance(this.type.getRawType()).getFieldsType();
 
-        result.values().forEach(fields->{
-            if(fields instanceof ParameterizedTypeWrapper){
+        result.values().forEach(fields -> {
+            if (fields instanceof ParameterizedTypeWrapper) {
 
-            }else  if(fields instanceof GenericArrayTypeWrapper){
+            } else if (fields instanceof GenericArrayTypeWrapper) {
 
-            }else  if(fields instanceof TypeVariableWrapper){
+            } else if (fields instanceof TypeVariableWrapper) {
 
-            }else {
+            } else {
 
             }
         });
@@ -63,15 +64,24 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
     public List<TypeShowDefinition> getFieldsTypeShowDefinition() {
         ParameterizedType realType = this.type;
         Class<?> rawType = Class.class.cast(realType.getRawType());
+        /* 把自己添加到终点类,防止循环解析 */
+        FinalJavaType.add(rawType);
         Field[] fields = rawType.getDeclaredFields();
         ClassOrInterfaceDeclaration parentClazzUnit = GenericityUtils.getClassOrInterfaceDeclaration(rawType.getTypeName());
         List<TypeShowDefinition> fieldsDef = Stream.of(fields).map(field -> {
             Type fGenericType = field.getGenericType();
             Map<String, Type> map = GenericityUtils.getMethodTypeGenericity(parentClazzUnit, realType);
-            return WrapperUtils.getInstance(fGenericType).getFieldTypeShowDefinition(field.getName(),parentClazzUnit,map);
+            return WrapperUtils.getInstance(fGenericType).getFieldTypeShowDefinition(field.getName(), parentClazzUnit, map);
         }).collect(Collectors.toList());
+        TypeWrapper superType = WrapperUtils.getInstance(rawType.getGenericSuperclass());
+        if(!superType.ifFinalType()){
+            /* 获取父类的属性 */
+            fieldsDef.addAll(superType.getFieldsTypeShowDefinition());
+        }
+        FinalJavaType.remove(rawType);
         return fieldsDef;
     }
+
 
     @Override
     public TypeShowDefinition getFieldTypeShowDefinition(String name, ClassOrInterfaceDeclaration parentClazz, Map<String, Type> genericitys) {
@@ -116,7 +126,6 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
     }
 
 
-
     @Override
     public String getTypeName() {
         return this.type.getTypeName();
@@ -129,6 +138,6 @@ public class ParameterizedTypeWrapper implements TypeWrapper {
 
     @Override
     public boolean ifFinalType() {
-      return   WrapperUtils.getInstance(this.type.getRawType()).ifFinalType();
+        return WrapperUtils.getInstance(this.type.getRawType()).ifFinalType();
     }
 }

@@ -2,9 +2,7 @@ package cn.xuxiaobu.doc.apis.enums;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -59,16 +57,30 @@ public enum FinalJavaType {
 
     private Class<?> type;
 
+   final private static List<String> analysisIngClass=new ArrayList<>();
+
     FinalJavaType(Class<?> type) {
         this.type = type;
     }
 
+    public static void add(Class<?> type){
+        analysisIngClass.add(type.getName());
+    }
+    public static void remove(Class<?> type){
+        analysisIngClass.remove(type.getName());
+    }
     public static boolean exists(Class clazz) {
+        /* java本身的类 */
         boolean javaClazz = StringUtils.startsWithAny(clazz.getTypeName(), "java.");
         if (javaClazz) {
             return true;
         }
-
+        /* 正在解析中的类 */
+        boolean analysisIngClassFlag = analysisIngClass.contains(clazz.getName());
+        if(analysisIngClassFlag){
+            return true;
+        }
+        /* 枚举中的类 */
         Optional<FinalJavaType> result = Stream.of(FinalJavaType.values())
                 .filter(finalJavaType -> finalJavaType.type.isAssignableFrom(clazz))
                 .findAny();

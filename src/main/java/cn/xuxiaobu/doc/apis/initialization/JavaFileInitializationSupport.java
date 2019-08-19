@@ -35,7 +35,7 @@ public class JavaFileInitializationSupport  {
     /**
      * 出现重复文件快速失败
      */
-    private Boolean ifFailFast = true;
+    private Boolean ifFailFast = false;
 
     public JavaFileInitializationSupport() {
     }
