@@ -77,7 +77,7 @@ public class DefaultJavaApiDefinition implements ConfigurableApiDefinition {
     /**
      * API参数
      */
-    private Object param;
+    private List<TypeShowDefinition> param;
     /**
      * API结果
      */

@@ -100,7 +100,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param param 参数
      * @return API
      */
-    ApiDefinition setParam(Object param);
+    ApiDefinition setParam(List<TypeShowDefinition> param);
 
     /**
      * 设置API的返回定义

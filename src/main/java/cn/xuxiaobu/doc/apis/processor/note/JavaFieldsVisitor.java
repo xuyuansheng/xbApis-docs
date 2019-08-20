@@ -24,7 +24,7 @@ public class JavaFieldsVisitor extends VoidVisitorAdapter<TypeShowDefinition> {
         if (fieldOpt.isPresent()) {
             fieldOpt.get().accept(this, arg);
         } else {
-            log.info("找不到对应的字段,ClassOrInterfaceDeclaration={} \n TypeShowDefinition={}",n,arg);
+            log.info("找不到对应的字段,ClassOrInterfaceDeclaration={} \n TypeShowDefinition={}",n.getFields(),arg);
         }
     }
 

@@ -2,18 +2,26 @@ package cn.xuxiaobu.doc.apis.processor.note;
 
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.ReturnTypeDefinition;
+import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
+import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
+import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
+import com.github.javaparser.javadoc.description.JavadocDescription;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -83,6 +91,8 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
         ReturnTypeDefinition returnTypeDefinition = arg.getReturnTypeDefinition();
         arg.setDescription(getDescription(n, false));
         returnTypeDefinition.init(type, getDescription(n, true));
+        /* 解析方法参数 */
+        arg.setParam(getParams(n, arg.getMethodMateData()));
     }
 
     /**
@@ -108,6 +118,41 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
             }
         });
         return result.toString();
+    }
+
+    /**
+     * 获取方法参数的数据
+     * @param n  方法的解析树
+     * @param method 方法
+     * @return 列表
+     */
+    private List<TypeShowDefinition>  getParams(MethodDeclaration n,Method  method){
+        Parameter[] params = method.getParameters();
+        JavadocBlockTag.Type type = JavadocBlockTag.Type.PARAM;
+        Map<String, JavadocBlockTag> paramsDoc = n.getJavadoc().orElse(new Javadoc(new JavadocDescription())).getBlockTags().stream()
+                .filter(p -> p.getType().equals(type)).collect(Collectors.toMap(k -> k.getName().orElse(RandomStringUtils.random(10)), v -> v));
+        List<TypeShowDefinition> typeShows = Stream.iterate(0, i -> i + 1).limit(params.length).map(i -> {
+            Parameter parameter = params[i];
+            JavadocBlockTag paramDoc = paramsDoc.get(parameter.getName());
+            if(paramDoc==null){
+                return null;
+            }
+            TypeWrapper parameterTypeWrapper = WrapperUtils.getInstance(parameter.getType());
+            TypeShowDefinition typeShowDefinition = new TypeShowDefinition()
+                    .setName(parameter.getName())
+                    .setCompleteTypeShow(parameterTypeWrapper.getTypeName())
+                    .setReturnTypeShow(parameterTypeWrapper.getSimpleName())
+                    .setDefaultValue("")
+                    .setDescription(paramDoc.getContent().toText())
+                    .setIfCollection(parameterTypeWrapper.ifArrayOrCollection())
+                    .setBelongsToClassName(parameterTypeWrapper.getCompleteClassName());
+
+            if (!parameterTypeWrapper.ifFinalType()) {
+                typeShowDefinition.setFields(parameterTypeWrapper.getFieldsTypeShowDefinition());
+            }
+            return typeShowDefinition;
+        }).filter(f->f!=null).collect(Collectors.toList());
+        return typeShows;
     }
 
 }

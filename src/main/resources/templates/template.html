@@ -11,22 +11,39 @@
     <p th:text="|URL : ${definition.getAddress(0)}|"></p>
     <p th:text="|接口名 : ${definition.getDefinitionName()}|"></p>
     <p th:text="|接口描述 : ${definition.getDescription()}|"></p>
-    <table border="1">
-        <tr>
-            <td align="center">名称</td>
-            <td>类型</td>
-            <td>默认值</td>
-            <td>描述</td>
-        </tr>
-        <tr>
-            <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()}"></td>
-            <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getReturnTypeShow()}"></td>
-            <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDefaultValue()}"></td>
-            <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDescription()}"></td>
-            <div th:replace="this::row(${definition.getReturnTypeDefinition().getTypeShowDefinition().getFields()},${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()})"></div>
+    <div>
+        <p>参数定义: </p>
+        <table border="1">
+            <tr>
+                <td align="center">名称</td>
+                <td>类型</td>
+                <td>默认值</td>
+                <td>描述</td>
+            </tr>
+            <div th:replace="this::row(${definition.getParam()},'')"></div>
 
-        </tr>
-    </table>
+        </table>
+    </div>
+   <div>
+       <p>返回值定义: </p>
+       <table border="1">
+           <tr>
+               <td align="center">名称</td>
+               <td>类型</td>
+               <td>默认值</td>
+               <td>描述</td>
+           </tr>
+           <tr>
+               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()}"></td>
+               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getReturnTypeShow()}"></td>
+               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDefaultValue()}"></td>
+               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDescription()}"></td>
+               <div th:replace="this::row(${definition.getReturnTypeDefinition().getTypeShowDefinition().getFields()},${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()})"></div>
+
+           </tr>
+       </table>
+   </div>
+
 </div>
 <!--<table border="1">-->
 
@@ -36,10 +53,14 @@
 <th:block th:fragment="row(typeReturns,lv)">
     <th:block th:each="type : ${typeReturns}">
         <tr style="text-align: center;">
-            <td th:text="|${lv}_${type.getName()}|" >名称</td>
+
+            <td th:text="|${lv}_${type.getName()}|" th:if="${lv!=null && lv!=''}" >名称</td>
+            <td th:text="|${type.getName()}|" th:if="${lv==null||lv==''}" >名称</td>
             <td th:text="${type.getReturnTypeShow()}">标识</td>
             <td th:text="${type.getDefaultValue()}">权限类型</td>
             <td th:text="${type.getDescription()}">权限资源</td>
+
+
         </tr>
         <th:block th:unless="${#lists.isEmpty(type.getFields())}" th:insert="this::row(${type.getFields()},${lv}+'_'+${type.getName()})"/>
     </th:block>

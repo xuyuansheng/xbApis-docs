@@ -105,7 +105,7 @@ public interface ApiDefinition {
      *
      * @return
      */
-    Object getParam();
+    List<TypeShowDefinition> getParam();
 
     /**
      * 获取返回信息数据
