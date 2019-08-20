@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class DefaultJavaApiDefinition implements ApiDefinition {
+public class DefaultJavaApiDefinition implements ConfigurableApiDefinition {
 
 
     public DefaultJavaApiDefinition() {
@@ -82,6 +82,8 @@ public class DefaultJavaApiDefinition implements ApiDefinition {
      * API结果
      */
     private ReturnTypeDefinition returnTypeDefinition;
+
+
 
     @Override
     public String getAddress(Integer index) {

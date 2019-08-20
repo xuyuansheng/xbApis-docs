@@ -3,6 +3,7 @@ package cn.xuxiaobu.doc.config;
 import cn.xuxiaobu.doc.apis.filter.java.JavaApiFilter;
 import cn.xuxiaobu.doc.apis.processor.url.ApiUrlDefinitionProcessor;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  */
 
 @Data
+@Accessors(chain = true)
 public class JavaConfig {
 
     /**
@@ -32,8 +34,8 @@ public class JavaConfig {
      * 项目依赖的jar包或class文件根目录
      */
     List<String> sourceDependencyClass;
-
-
+    /** 文档输出目录 */
+    String outPutDir;
     /**
      * 类和方法过滤器
      */

@@ -8,10 +8,12 @@ import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.config.JavaConfig;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
+import cn.xuxiaobu.doc.util.processor.ThymeleafUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -65,6 +67,8 @@ public abstract class AbstractJavaProcessSynopsis {
         getApiMetadata();
         /* 6.处理API元数据,得到全部的定义 */
         apiDefinitionProcess();
+        /* 7.生成html等文档 */
+        buildHtml();
 
         log.info(JSON.toJSONString(apiDefinitions));
     }
@@ -168,4 +172,12 @@ public abstract class AbstractJavaProcessSynopsis {
         return definitions;
     }
 
+    private void buildHtml() {
+        try {
+            ThymeleafUtil.buildHtml("template",this.javaConfig.getOutPutDir()+File.separator+"index.html",this.apiDefinitions);
+        } catch (IOException e) {
+            log.info("生成API的html文件出错");
+            log.error("生成API的html文件出错",e);
+        }
+    }
 }
