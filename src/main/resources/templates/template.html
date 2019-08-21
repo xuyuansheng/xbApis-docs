@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body>
 <span>接口定义列表</span><br/>
@@ -13,36 +16,51 @@
     <p th:text="|接口描述 : ${definition.getDescription()}|"></p>
     <div>
         <p>参数定义: </p>
-        <table border="1">
+        <table class="table table-condensed table-hover table-bordered" contenteditable="true">
+            <thead>
             <tr>
-                <td align="center">名称</td>
-                <td>类型</td>
-                <td>默认值</td>
-                <td>描述</td>
+                <th style="text-align: center; vertical-align: middle;">名称</th>
+                <th style="text-align: center; vertical-align: middle;">类型</th>
+                <th style="text-align: center; vertical-align: middle;">默认值</th>
+                <th style="text-align: center; vertical-align: middle;">描述</th>
             </tr>
+            </thead>
             <div th:replace="this::row(${definition.getParam()},'')"></div>
 
         </table>
     </div>
-   <div>
-       <p>返回值定义: </p>
-       <table border="1">
-           <tr>
-               <td align="center">名称</td>
-               <td>类型</td>
-               <td>默认值</td>
-               <td>描述</td>
-           </tr>
-           <tr>
-               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()}"></td>
-               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getReturnTypeShow()}"></td>
-               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDefaultValue()}"></td>
-               <td th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDescription()}"></td>
-               <div th:replace="this::row(${definition.getReturnTypeDefinition().getTypeShowDefinition().getFields()},${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()})"></div>
-
-           </tr>
-       </table>
-   </div>
+    <div>
+        <p>返回值定义: </p>
+        <table class="table table-condensed table-hover table-bordered" contenteditable="true">
+            <thead>
+            <tr>
+                <th style="text-align: center; vertical-align: middle;">名称</th>
+                <th style="text-align: center; vertical-align: middle;">类型</th>
+                <th style="text-align: center; vertical-align: middle;">默认值</th>
+                <th style="text-align: center; vertical-align: middle;">描述</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="text-align: center; vertical-align: middle;"
+                    th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()}">1
+                </td>
+                <td style="text-align: center; vertical-align: middle;"
+                    th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getReturnTypeShow()}">TB -
+                    Monthly
+                </td>
+                <td style="text-align: center; vertical-align: middle;"
+                    th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDefaultValue()}">
+                    01/04/2012
+                </td>
+                <td style="text-align: center; vertical-align: middle;"
+                    th:text="${definition.getReturnTypeDefinition().getTypeShowDefinition().getDescription()}">Default
+                </td>
+            </tr>
+            <div th:replace="this::row(${definition.getReturnTypeDefinition().getTypeShowDefinition().getFields()},${definition.getReturnTypeDefinition().getTypeShowDefinition().getName()})"></div>
+            </tbody>
+        </table>
+    </div>
 
 </div>
 <!--<table border="1">-->
@@ -51,18 +69,20 @@
 <!--</table>-->
 
 <th:block th:fragment="row(typeReturns,lv)">
-    <th:block th:each="type : ${typeReturns}">
-        <tr style="text-align: center;">
-
-            <td th:text="|${lv}_${type.getName()}|" th:if="${lv!=null && lv!=''}" >名称</td>
-            <td th:text="|${type.getName()}|" th:if="${lv==null||lv==''}" >名称</td>
-            <td th:text="${type.getReturnTypeShow()}">标识</td>
-            <td th:text="${type.getDefaultValue()}">权限类型</td>
-            <td th:text="${type.getDescription()}">权限资源</td>
-
-
+    <th:block th:each="type,iterStat : ${typeReturns}">
+        <tr th:class="${iterStat.index%3==0}?'':(${iterStat.index%3==1}?'info':'success')" >
+        <td style="text-align: center; vertical-align: middle;" th:text="|${lv}_${type.getName()}|"
+                th:if="${lv!=null && lv!=''}">名称
+            </td>
+            <td style="text-align: center; vertical-align: middle;" th:text="|${type.getName()}|"
+                th:if="${lv==null||lv==''}">名称
+            </td>
+            <td style="text-align: center; vertical-align: middle;" th:text="${type.getReturnTypeShow()}">标识</td>
+            <td style="text-align: center; vertical-align: middle;" th:text="${type.getDefaultValue()}">权限类型</td>
+            <td style="text-align: center; vertical-align: middle;" th:text="${type.getDescription()}">权限资源</td>
         </tr>
-        <th:block th:unless="${#lists.isEmpty(type.getFields())}" th:insert="this::row(${type.getFields()},${lv}+'_'+${type.getName()})"/>
+        <th:block th:unless="${#lists.isEmpty(type.getFields())}"
+                  th:insert="this::row(${type.getFields()},${lv}+'_'+${type.getName()})"/>
     </th:block>
 </th:block>
 
