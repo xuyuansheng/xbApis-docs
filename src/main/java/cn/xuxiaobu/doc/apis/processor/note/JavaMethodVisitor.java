@@ -1,10 +1,12 @@
 package cn.xuxiaobu.doc.apis.processor.note;
 
+import cn.xuxiaobu.doc.apis.annotions.Apis;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.ReturnTypeDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
+import cn.xuxiaobu.doc.util.processor.AnnotationUtils;
 import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -69,14 +71,14 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 /* 上面第 i 个参数的全类名没匹配到,则用简单类名simpleName去匹配,找到了继续下一个参数,没找到表示第 i 个参数没匹配到任何方法,查找失败  */
                 typeNameMatched = typeNameMatched.stream().filter(m -> m.getParameter(finalI).getTypeAsString().equals(paramsTypeList.get(finalI).getSimpleName())).collect(Collectors.toList());
             }
-            if(typeNameMatched.size()==1){
+            if (typeNameMatched.size() == 1) {
                 /* 只找到一个,即匹配上 */
                 typeNameMatched.get(0).accept(this, arg);
                 return;
-            }else if(typeNameMatched.size()<1){
+            } else if (typeNameMatched.size() < 1) {
                 /* 一个都没找到,方法出错 */
                 log.info("方法匹配出错,类={}\n方法={}\n解析树={}", classData, methodData, n);
-            }else {
+            } else {
                 /* 一个都没找到,方法出错 */
                 log.info("方法匹配到多个,取第一个,类={}\n方法={}\n解析树={}", classData, methodData, n);
                 typeNameMatched.get(0).accept(this, arg);
@@ -87,7 +89,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
 
     @Override
     public void visit(MethodDeclaration n, DefaultJavaApiDefinition arg) {
-        Type type = arg.getMethodMateData().getGenericReturnType();
+        Type type = getMethodReturnType(arg.getMethodMateData());
         ReturnTypeDefinition returnTypeDefinition = arg.getReturnTypeDefinition();
         arg.setDescription(getDescription(n, false));
         returnTypeDefinition.init(type, getDescription(n, true));
@@ -122,22 +124,29 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
 
     /**
      * 获取方法参数的数据
-     * @param n  方法的解析树
+     *
+     * @param n      方法的解析树
      * @param method 方法
      * @return 列表
      */
-    private List<TypeShowDefinition>  getParams(MethodDeclaration n,Method  method){
+    private List<TypeShowDefinition> getParams(MethodDeclaration n, Method method) {
         Parameter[] params = method.getParameters();
+        Apis paramsApis = AnnotationUtils.getApisAnnotation(method);
         JavadocBlockTag.Type type = JavadocBlockTag.Type.PARAM;
         Map<String, JavadocBlockTag> paramsDoc = n.getJavadoc().orElse(new Javadoc(new JavadocDescription())).getBlockTags().stream()
-                .filter(p -> p.getType().equals(type)).collect(Collectors.toMap(k -> k.getName().orElse(RandomStringUtils.random(10)), v -> v,(m1,m2)->m2));
+                .filter(p -> p.getType().equals(type)).collect(Collectors.toMap(k -> k.getName().orElse(RandomStringUtils.random(10)), v -> v, (m1, m2) -> m2));
         List<TypeShowDefinition> typeShows = Stream.iterate(0, i -> i + 1).limit(params.length).map(i -> {
             Parameter parameter = params[i];
             JavadocBlockTag paramDoc = paramsDoc.get(parameter.getName());
-            if(paramDoc==null){
+            if (paramDoc == null) {
                 return null;
             }
-            TypeWrapper parameterTypeWrapper = WrapperUtils.getInstance(parameter.getType());
+            Class<?> parameterType = parameter.getType();
+            if(paramsApis!=null&&paramsApis.paramsType().length>i){
+                /* 注解不为null 且 注解中的paramsType的长度大于 i */
+                parameterType = paramsApis.paramsType()[i];
+            }
+            TypeWrapper parameterTypeWrapper = WrapperUtils.getInstance(parameterType);
             TypeShowDefinition typeShowDefinition = new TypeShowDefinition()
                     .setName(parameter.getName())
                     .setCompleteTypeShow(parameterTypeWrapper.getTypeName())
@@ -151,8 +160,27 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 typeShowDefinition.setFields(parameterTypeWrapper.getFieldsTypeShowDefinition());
             }
             return typeShowDefinition;
-        }).filter(f->f!=null).collect(Collectors.toList());
+        }).filter(f -> f != null).collect(Collectors.toList());
         return typeShows;
+    }
+
+    /**
+     * 获取方法的返回值
+     * @param method 方法
+     * @return
+     */
+    private Type getMethodReturnType(Method method) {
+        final String voidString = "void";
+        Type type = method.getGenericReturnType();
+        if (voidString.equals(type.getTypeName())) {
+            Apis apis = AnnotationUtils.getApisAnnotation(method);
+            if (apis == null || Object.class.equals(apis.returnType())) {
+                /* 没找到注解或者注解的returnType只是默认值 */
+                return type;
+            }
+            return apis.returnType();
+        }
+        return type;
     }
 
 }

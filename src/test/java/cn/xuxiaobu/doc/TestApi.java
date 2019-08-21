@@ -1,5 +1,7 @@
 package cn.xuxiaobu.doc;
 
+import cn.xuxiaobu.doc.apis.annotions.Apis;
+import cn.xuxiaobu.doc.apis.annotions.JdkDynamicProxy;
 import cn.xuxiaobu.doc.apis.initialization.JavaFileInitializationSupport;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +23,15 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @RequestMapping()
+@Apis(value = "value",returnType = ClassLoader.class)
 public class TestApi {
 
     @Test
     public void test(){
-        String[] ap = TestApi.class.getAnnotation(RequestMapping.class).path();
-        System.out.println(TestApi.class.getAnnotation(RequestMapping.class).value().length);
-
-        log.debug("debug",ap);
-        log.warn("warn");
-        log.info("info {}", Stream.of(1,2,3,4).collect(Collectors.toList()));
-        log.error("error");
+        Apis apis = TestApi.class.getAnnotation(Apis.class);
+        boolean is = Object.class.equals(Object.class);
+        boolean a = Apis.class.isAssignableFrom(apis.returnType());
+        boolean b = new JdkDynamicProxy(apis).getProxy().getClass().equals(Apis.class);
     }
 
     @Test

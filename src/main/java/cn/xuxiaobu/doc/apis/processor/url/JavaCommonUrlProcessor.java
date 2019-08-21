@@ -1,12 +1,11 @@
 package cn.xuxiaobu.doc.apis.processor.url;
 
 import cn.xuxiaobu.doc.apis.annotions.Apis;
-import cn.xuxiaobu.doc.apis.annotions.JdkDynamicProxy;
 import cn.xuxiaobu.doc.apis.definition.ApiDefinition;
 import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
+import cn.xuxiaobu.doc.util.processor.AnnotationUtils;
 import cn.xuxiaobu.doc.util.processor.ProcessorUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +35,13 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
         List<String> methodListResult = new ArrayList<>(0);
         StringBuilder url = new StringBuilder();
         Class<?> clazzData = defaultJavaApiDefinition.getClazzMateData();
-        Apis clazzApis = doGetAnnotation(clazzData);
+        Apis clazzApis = AnnotationUtils.getApisAnnotation(clazzData);
         Optional.of(clazzApis).ifPresent(api->{
             methodListResult.addAll(Stream.of(api.method()).collect(Collectors.toList()));
             url.append(ProcessorUtils.urlFormat(api.value()));
         });
         Method methodMateData = defaultJavaApiDefinition.getMethodMateData();
-        Apis methodApis = doGetAnnotation(methodMateData);
+        Apis methodApis = AnnotationUtils.getApisAnnotation(methodMateData);
         Optional.of(methodApis).ifPresent(api->{
             methodListResult.addAll(Stream.of(api.method()).collect(Collectors.toList()));
             url.append(ProcessorUtils.urlFormat(api.value()));
@@ -53,44 +52,6 @@ public class JavaCommonUrlProcessor implements ApiUrlDefinitionProcessor {
         }
         defaultJavaApiDefinition.setMethod(methodListResult);
         defaultJavaApiDefinition.setUrl(Stream.of(url.toString()).collect(Collectors.toList()));
-    }
-
-    /**
-     * 获取类上的自定义注解
-     * @param clazz
-     * @return
-     */
-    private Apis doGetAnnotation(Class<?> clazz){
-        Apis urlAnnotation = clazz.getDeclaredAnnotation(Apis.class);
-        if (urlAnnotation != null) {
-            return urlAnnotation;
-        }
-        Optional<Annotation> apis = Stream.of(clazz.getDeclaredAnnotations()).filter(an -> "Apis".equals(an.annotationType().getSimpleName()))
-                .findAny();
-        if(apis.isPresent()){
-            Annotation api = apis.get();
-           return new JdkDynamicProxy(api).getProxy();
-        }
-        return null;
-    }
-
-    /**
-     * 获取方法上的自定义注解
-     * @param method
-     * @return
-     */
-    private Apis doGetAnnotation(Method method){
-        Apis urlAnnotation = method.getDeclaredAnnotation(Apis.class);
-        if (urlAnnotation != null) {
-            return urlAnnotation;
-        }
-        Optional<Annotation> apis = Stream.of(method.getDeclaredAnnotations()).filter(an -> "Apis".equals(an.annotationType().getSimpleName()))
-                .findAny();
-        if(apis.isPresent()){
-            Annotation api = apis.get();
-            return new JdkDynamicProxy(api).getProxy();
-        }
-        return null;
     }
 
 }

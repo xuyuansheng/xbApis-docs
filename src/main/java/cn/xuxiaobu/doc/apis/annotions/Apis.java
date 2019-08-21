@@ -12,13 +12,31 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Apis {
-    /**  */
+    /**
+     * 名称
+     */
     String name() default "";
-    
+
+    /**
+     * url的值
+     */
     String value() default "";
-    
-    String[] method()default {};
-    
+
+    /**
+     * 方法支持的请求方式
+     */
+    String[] method() default {};
+
+    /**
+     * 方法参数
+     */
+    Class<?>[] paramsType() default {};
+
+    /**
+     * 方法的返回值
+     */
+    Class<?> returnType() default Object.class;
+
     String[] params() default {};
 
     String[] headers() default {};
@@ -26,5 +44,6 @@ public @interface Apis {
     String[] consumes() default {};
 
     String[] produces() default {};
-    
+
+
 }
