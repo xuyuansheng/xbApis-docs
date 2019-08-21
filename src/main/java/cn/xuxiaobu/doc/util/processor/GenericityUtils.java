@@ -115,7 +115,7 @@ public class GenericityUtils {
         if (listActType.size() != listTypeParam.size()) {
             log.info("泛型无法匹配,clazz={} \n type={}", clazz, type);
         }
-        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i + 1).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v)));
+        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i + 1).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v),(m1,m2)->m2));
         return selfTypeParameters;
     }
 
@@ -140,7 +140,7 @@ public class GenericityUtils {
         if (listActType.size() != listTypeParam.size()) {
             log.info("泛型无法匹配,clazz={} \n type={}", clazz, type);
         }
-        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i + 1).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v)));
+        Map<String, Type> selfTypeParameters = Stream.iterate(0, i -> i + 1).limit(listActType.size()).collect(Collectors.toMap(k -> listTypeParam.get(k), v -> listActType.get(v),(m1,m2)->m2));
         return selfTypeParameters;
     }
 

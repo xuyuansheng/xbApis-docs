@@ -2,6 +2,8 @@ package cn.xuxiaobu.doc.apis.enums;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -49,6 +51,9 @@ public enum FinalJavaType {
      */
     COLLECTIONS(Collection.class),
     MAPS(Map.class),
+    /** web类 */
+    SERVLETREQUEST(ServletRequest.class),
+    SERVLETRESPONSE(ServletResponse.class),
     /**
      * 数字类
      */

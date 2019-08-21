@@ -48,9 +48,9 @@ public class ClassWrapper implements TypeWrapper {
         }
         if (ifArray()) {
             Class<?> arrayComponentType = type.getComponentType();
-            map = Stream.of(arrayComponentType.getDeclaredFields()).filter(field -> !field.getType().equals(arrayComponentType)).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));
+            map = Stream.of(arrayComponentType.getDeclaredFields()).filter(field -> !field.getType().equals(arrayComponentType)).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance,(m1,m2)->m2));
         } else {
-            map = Stream.of(type.getDeclaredFields()).filter(field -> !field.getType().equals(type)).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance));
+            map = Stream.of(type.getDeclaredFields()).filter(field -> !field.getType().equals(type)).collect(Collectors.toMap(Field::getName, WrapperUtils::getInstance,(m1,m2)->m2));
         }
         return map;
     }

@@ -130,7 +130,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
         Parameter[] params = method.getParameters();
         JavadocBlockTag.Type type = JavadocBlockTag.Type.PARAM;
         Map<String, JavadocBlockTag> paramsDoc = n.getJavadoc().orElse(new Javadoc(new JavadocDescription())).getBlockTags().stream()
-                .filter(p -> p.getType().equals(type)).collect(Collectors.toMap(k -> k.getName().orElse(RandomStringUtils.random(10)), v -> v));
+                .filter(p -> p.getType().equals(type)).collect(Collectors.toMap(k -> k.getName().orElse(RandomStringUtils.random(10)), v -> v,(m1,m2)->m2));
         List<TypeShowDefinition> typeShows = Stream.iterate(0, i -> i + 1).limit(params.length).map(i -> {
             Parameter parameter = params[i];
             JavadocBlockTag paramDoc = paramsDoc.get(parameter.getName());
