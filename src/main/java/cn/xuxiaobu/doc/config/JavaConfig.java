@@ -37,6 +37,18 @@ public class JavaConfig {
     /** 文档输出目录 */
     String outPutDir;
     /**
+     * 协议
+     */
+    private String protocol;
+    /**
+     * 域名
+     */
+    private String host;
+    /**
+     * 端口
+     */
+    private String port;
+    /**
      * 类和方法过滤器
      */
     List<JavaApiFilter> apiFilters;

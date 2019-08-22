@@ -7,6 +7,7 @@ import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaCommonClassFilter;
 import cn.xuxiaobu.doc.apis.filter.java.clazzfilter.JavaSpringControllerFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaCommonMethodFilter;
 import cn.xuxiaobu.doc.apis.filter.java.methodfilter.JavaSpringMethodFilter;
+import cn.xuxiaobu.doc.apis.processor.config.JavaApiConfigProcessor;
 import cn.xuxiaobu.doc.apis.processor.note.JavaApiNoteProcessor;
 import cn.xuxiaobu.doc.apis.processor.url.JavaUrlProcessorSupport;
 import cn.xuxiaobu.doc.config.JavaConfig;
@@ -35,8 +36,9 @@ public class MavenJavaProcessSynopsis extends AbstractJavaProcessSynopsis {
         /* 获取注释信息 */
         super.apiDefinitions.forEach(def->{
             new JavaApiNoteProcessor(super.javaDependencySourceFileContext).postNoteProcess(def);
+            /* 处理API的协议,域名,端口等配置信息 */
+            new JavaApiConfigProcessor(javaConfig).postConfigProcess(def);
         });
-        /* 处理API描述等注释信息 */
 
     }
 

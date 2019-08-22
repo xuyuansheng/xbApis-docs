@@ -19,7 +19,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param host 域名
      * @return
      */
-    ApiDefinition setHost(String host);
+    ConfigurableApiDefinition setHost(String host);
 
     /**
      * 设置端口
@@ -27,7 +27,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param port 端口
      * @return
      */
-    ApiDefinition setPort(String port);
+    ConfigurableApiDefinition setPort(String port);
 
     /**
      * 设置URL,API的URL部分,不包含域名端口等
@@ -35,7 +35,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param urls url列表
      * @return
      */
-    ApiDefinition setUrl(List<String> urls);
+    ConfigurableApiDefinition setUrl(List<String> urls);
 
     /**
      * 设置接口描述
@@ -43,7 +43,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param description
      * @return
      */
-    ApiDefinition setDescription(String description);
+    ConfigurableApiDefinition setDescription(String description);
 
     /**
      * 设置API来源数据
@@ -51,7 +51,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param definitionType
      * @return
      */
-    ApiDefinition setDefinitionFrom(JavaFrameworkType definitionType);
+    ConfigurableApiDefinition setDefinitionFrom(JavaFrameworkType definitionType);
 
 
     /**
@@ -60,7 +60,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param method
      * @return
      */
-    ApiDefinition setMethod(List<String> method);
+    ConfigurableApiDefinition setMethod(List<String> method);
 
     /**
      * 设置类元数据
@@ -68,7 +68,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param clazzMateData
      * @return
      */
-    ApiDefinition setClazzMateData(Class<?> clazzMateData);
+    ConfigurableApiDefinition setClazzMateData(Class<?> clazzMateData);
 
     /**
      * 设置API源码数据
@@ -76,7 +76,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param javaFileMateData
      * @return
      */
-    ApiDefinition setJavaFileMateData(Resource javaFileMateData);
+    ConfigurableApiDefinition setJavaFileMateData(Resource javaFileMateData);
 
     /**
      * 设置API方法元数据
@@ -84,7 +84,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param methodMateData API的方法
      * @return
      */
-    ApiDefinition setMethodMateData(Method methodMateData);
+    ConfigurableApiDefinition setMethodMateData(Method methodMateData);
 
     /**
      * 设置API支持的协议
@@ -92,7 +92,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param protocol 协议名
      * @return API
      */
-    ApiDefinition setProtocol(String protocol);
+    ConfigurableApiDefinition setProtocol(String protocol);
 
     /**
      * 设置API的参数
@@ -100,7 +100,7 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param param 参数
      * @return API
      */
-    ApiDefinition setParam(List<TypeShowDefinition> param);
+    ConfigurableApiDefinition setParam(List<TypeShowDefinition> param);
 
     /**
      * 设置API的返回定义
@@ -108,6 +108,6 @@ public interface ConfigurableApiDefinition extends ApiDefinition {
      * @param returnTypeDefinition API定义
      * @return API
      */
-    ApiDefinition setReturnTypeDefinition(ReturnTypeDefinition returnTypeDefinition);
+    ConfigurableApiDefinition setReturnTypeDefinition(ReturnTypeDefinition returnTypeDefinition);
 
 }

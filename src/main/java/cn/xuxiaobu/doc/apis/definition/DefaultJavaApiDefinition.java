@@ -84,11 +84,10 @@ public class DefaultJavaApiDefinition implements ConfigurableApiDefinition {
     private ReturnTypeDefinition returnTypeDefinition;
 
 
-
     @Override
     public String getAddress(Integer index) {
         int resultIndex = Math.max(0, Math.min(index, this.url.size() - 1));
-        return this.protocol + "://" + this.host + ":" + this.port + "/" + this.url.get(resultIndex);
+        return this.protocol + "://" + this.host + ":" + this.port + this.url.get(resultIndex);
     }
 
     @Override
