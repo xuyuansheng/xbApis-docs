@@ -3,7 +3,7 @@ target/
 .mvn/
 !**/src/main/**
 !**/src/test/**
-
+/xb-log
 ### STS ###
 .apt_generated
 .classpath
