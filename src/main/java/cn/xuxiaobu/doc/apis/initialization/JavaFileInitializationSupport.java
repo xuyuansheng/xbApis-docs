@@ -2,19 +2,24 @@ package cn.xuxiaobu.doc.apis.initialization;
 
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.resource.JarInnerFileResource;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 /**
  * Java文件的初始化
@@ -68,6 +73,7 @@ public class JavaFileInitializationSupport  {
                 String key = StringUtils.replacePattern(f.getName(), fileSuffix, "");
                 if (temp.get(key) == null) {
                     temp.put(key, new FileSystemResource(f));
+                    this.analysisMultiple(temp, f, key);
                 } else {
                     if (ifFailFast) {
                         log.info("已经存在相同的文件={} , {}",f.getName(),key);
@@ -81,6 +87,29 @@ public class JavaFileInitializationSupport  {
         return root;
     }
 
+    /**
+     * 一个java文件中有多个java类时(注意:不是内部类)
+     * @param temp   源码文件树
+     * @param file  类名对应的文件
+     * @param key  类名
+     */
+    private void  analysisMultiple(LinkedHashMap<String, Object> temp,File file,String key){
+        try {
+            List<ClassOrInterfaceDeclaration> otherClassList = new JavaParser().parse(file).getResult().get().getChildNodes().stream()
+                    .filter(ff -> ff instanceof ClassOrInterfaceDeclaration)
+                    .map(mm -> ClassOrInterfaceDeclaration.class.cast(mm))
+                    .filter(mm -> !mm.getNameAsString().equals(key))
+                    .collect(Collectors.toList());
+            otherClassList.forEach(oo->{
+                Object alreadyIn = temp.get(oo.getNameAsString());
+                if(alreadyIn==null){
+                    temp.put(oo.getNameAsString(), temp.get(key));
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 初始化源码压缩文件
      *

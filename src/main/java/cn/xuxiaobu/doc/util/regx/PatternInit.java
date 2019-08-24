@@ -12,8 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 正则表达式预编译类
@@ -24,6 +22,8 @@ import java.util.stream.Stream;
 public class PatternInit {
     /** 替换类名前面的所有包名和点号 */
     public static Pattern classNameReg = Pattern.compile(".*(?=\\.).");
+    /**  去掉java类型的泛型, 如: java.lang.List<String> -> java.lang.List , Map<String,Object> -> Map  */
+    public static Pattern classTypeGeneric = Pattern.compile("<.*>");
 
 
 
@@ -32,6 +32,11 @@ public class PatternInit {
         String index = PatternInit.class.getName();
         index = NNN.MMM.class.getName();
         ClassOrInterfaceDeclaration re = getClassOrInterfaceDeclaration(index, path.toFile());
+        String list = "java.lang.List<String>";
+        String map = "Map<String,Object>";
+        String a = StringUtils.replacePattern(list, PatternInit.classTypeGeneric.toString(), "");
+        String b = StringUtils.replacePattern(map, PatternInit.classTypeGeneric.toString(), "");
+
     }
 
 

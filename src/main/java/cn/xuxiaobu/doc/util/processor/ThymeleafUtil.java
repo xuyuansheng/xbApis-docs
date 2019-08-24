@@ -50,6 +50,7 @@ public class ThymeleafUtil {
         context.setVariable("apiDefinitions", apiDefinitions);
         context.setVariable("typeReturns",new ArrayList<TypeShowDefinition>());
         context.setVariable("lv","");
+        context.setVariable("dian",".");
         templateEngine.process(templateName, context, new FileWriter(filePath.toString()));
 
     }

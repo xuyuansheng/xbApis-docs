@@ -7,6 +7,7 @@ import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
 import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.util.processor.AnnotationUtils;
+import cn.xuxiaobu.doc.util.regx.PatternInit;
 import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -17,6 +18,7 @@ import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
@@ -63,13 +65,23 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
             for (int i = 0; i < paramsTypeList.size(); i++) {
                 int finalI = i;
                 /* 匹配第 i 个参数的全类名,找到了表示成功,继续下一个 */
-                List<MethodDeclaration> typeNameMatchedTemp = typeNameMatched.stream().filter(m -> m.getParameter(finalI).getTypeAsString().equals(paramsTypeList.get(finalI).getTypeName())).collect(Collectors.toList());
+                List<MethodDeclaration> typeNameMatchedTemp = typeNameMatched.stream().filter(m -> {
+                    String simpleName = paramsTypeList.get(finalI).getTypeName();
+                    String typeNmae = m.getParameter(finalI).getTypeAsString();
+                    String typeNmaeNoGeneric = StringUtils.replacePattern(typeNmae, PatternInit.classTypeGeneric.toString(), "");
+                    return simpleName.equals(typeNmaeNoGeneric);
+                }).collect(Collectors.toList());
                 if (!CollectionUtils.isEmpty(typeNameMatchedTemp)) {
                     typeNameMatched = typeNameMatchedTemp;
                     continue;
                 }
                 /* 上面第 i 个参数的全类名没匹配到,则用简单类名simpleName去匹配,找到了继续下一个参数,没找到表示第 i 个参数没匹配到任何方法,查找失败  */
-                typeNameMatched = typeNameMatched.stream().filter(m -> m.getParameter(finalI).getTypeAsString().equals(paramsTypeList.get(finalI).getSimpleName())).collect(Collectors.toList());
+                typeNameMatched = typeNameMatched.stream().filter(m -> {
+                    String simpleName = paramsTypeList.get(finalI).getSimpleName();
+                    String typeNmae = m.getParameter(finalI).getTypeAsString();
+                    String typeNmaeNoGeneric = StringUtils.replacePattern(typeNmae, PatternInit.classTypeGeneric.toString(), "");
+                    return simpleName.equals(typeNmaeNoGeneric);
+                }).collect(Collectors.toList());
             }
             if (typeNameMatched.size() == 1) {
                 /* 只找到一个,即匹配上 */
@@ -142,7 +154,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 return null;
             }
             Class<?> parameterType = parameter.getType();
-            if(paramsApis!=null&&paramsApis.paramsType().length>i){
+            if (paramsApis != null && paramsApis.paramsType().length > i) {
                 /* 注解不为null 且 注解中的paramsType的长度大于 i */
                 parameterType = paramsApis.paramsType()[i];
             }
@@ -166,6 +178,7 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
 
     /**
      * 获取方法的返回值
+     *
      * @param method 方法
      * @return
      */

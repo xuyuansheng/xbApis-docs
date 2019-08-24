@@ -11,9 +11,12 @@
 <span>接口定义列表</span><br/>
 
 <div th:each="definition : ${apiDefinitions}">
-    <p th:text="|URL : ${definition.getAddress(0)}|"></p>
-    <p th:text="|接口名 : ${definition.getDefinitionName()}|"></p>
-    <p th:text="|接口描述 : ${definition.getDescription()}|"></p>
+
+    <ul contenteditable="true">
+        <li th:text="|URL : ${definition.getAddress(0)}|"     >新闻资讯</li>
+        <li th:text="|接口名 : ${definition.getDefinitionName()}|" >体育竞技</li>
+        <li th:text="|接口描述 : ${definition.getDescription()}|"   >娱乐八卦</li>
+    </ul>
     <div>
         <p>参数定义: </p>
         <table class="table table-condensed table-hover table-bordered" contenteditable="true">
@@ -71,18 +74,17 @@
 <th:block th:fragment="row(typeReturns,lv)">
     <th:block th:each="type,iterStat : ${typeReturns}">
         <tr th:class="${iterStat.index%3==0}?'':(${iterStat.index%3==1}?'info':'success')" >
-        <td style="text-align: center; vertical-align: middle;" th:text="|${lv}_${type.getName()}|"
-                th:if="${lv!=null && lv!=''}">名称
+        <td style="text-align: center; vertical-align: middle;" th:text="|${lv}${dian}${type.getName()}|"
+                th:if="${lv!=''}">名称
             </td>
             <td style="text-align: center; vertical-align: middle;" th:text="|${type.getName()}|"
-                th:if="${lv==null||lv==''}">名称
+                th:if="${lv==''}">名称
             </td>
             <td style="text-align: center; vertical-align: middle;" th:text="${type.getReturnTypeShow()}">标识</td>
             <td style="text-align: center; vertical-align: middle;" th:text="${type.getDefaultValue()}">权限类型</td>
             <td style="text-align: center; vertical-align: middle;" th:text="${type.getDescription()}">权限资源</td>
         </tr>
-        <th:block th:unless="${#lists.isEmpty(type.getFields())}"
-                  th:insert="this::row(${type.getFields()},${lv}+'_'+${type.getName()})"/>
+        <th:block th:unless="${#lists.isEmpty(type.getFields())}" th:insert="this::row(${type.getFields()},${lv==''?'':(lv+'.')}+${type.getName()})"/>
     </th:block>
 </th:block>
 
