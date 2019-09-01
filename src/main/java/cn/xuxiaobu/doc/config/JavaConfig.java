@@ -19,6 +19,19 @@ import java.util.List;
 public class JavaConfig {
 
     /**
+     * 文档的标题
+     */
+    String title = "文档的标题";
+    /**
+     * 文档的版本
+     */
+    String version = "1.1.1";
+    /**
+     * 文档的描述,不是api的描述,不能弄混了
+     */
+    String description;
+
+    /**
      * 源码目录
      */
     String sourceJavaDir;
@@ -34,7 +47,9 @@ public class JavaConfig {
      * 项目依赖的jar包或class文件根目录
      */
     List<String> sourceDependencyClass;
-    /** 文档输出目录 */
+    /**
+     * 文档输出目录
+     */
     String outPutDir;
     /**
      * 协议

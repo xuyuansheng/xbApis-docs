@@ -174,7 +174,7 @@ public abstract class AbstractJavaProcessSynopsis {
 
     private void buildHtml() {
         try {
-            ThymeleafUtil.buildHtml("template",this.javaConfig.getOutPutDir()+File.separator+"index.html",this.apiDefinitions);
+            ThymeleafUtil.buildHtml("template",this.javaConfig.getOutPutDir()+File.separator+"index.html",this.apiDefinitions,this.javaConfig);
         } catch (IOException e) {
             log.info("生成API的html文件出错");
             log.error("生成API的html文件出错",e);
