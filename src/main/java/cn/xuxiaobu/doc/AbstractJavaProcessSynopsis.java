@@ -7,7 +7,9 @@ import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.apis.parser.JavaApiParser;
 import cn.xuxiaobu.doc.exceptions.InitSourceException;
 import cn.xuxiaobu.doc.config.JavaConfig;
+import cn.xuxiaobu.doc.export.postman.PostManApiJson;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
+import cn.xuxiaobu.doc.util.processor.PostManUtils;
 import cn.xuxiaobu.doc.util.processor.ThymeleafUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -105,11 +107,11 @@ public abstract class AbstractJavaProcessSynopsis {
                 URL sourceFile = new File(s).toURI().toURL();
                 return sourceFile;
             } catch (MalformedURLException e) {
-                log.error("转换为URL失败 ",e);
-                log.info("转换为URL失败",s);
+                log.error("转换为URL失败 ", e);
+                log.info("转换为URL失败", s);
                 return null;
             }
-        }).filter(n->n!=null).collect(Collectors.toList());
+        }).filter(n -> n != null).collect(Collectors.toList());
         this.javaDependencySourceFileContext = new JavaSourceFileContext(new JavaFileInitializationSupport(), urls);
         /* 把源码文件赋值到util类中,可以全局使用 */
         GenericityUtils.setJavaSourceFileContext(this.javaDependencySourceFileContext);
@@ -128,11 +130,11 @@ public abstract class AbstractJavaProcessSynopsis {
                 URL url = new File(s).toURI().toURL();
                 return url;
             } catch (MalformedURLException e) {
-                log.error("转换为URL失败 ",e);
-                log.info("转换为URL失败",s);
+                log.error("转换为URL失败 ", e);
+                log.info("转换为URL失败", s);
                 return null;
             }
-        }).filter(n->n!=null).collect(Collectors.toList());
+        }).filter(n -> n != null).collect(Collectors.toList());
         URL[] urlArray = urls.stream().toArray(k -> new URL[urls.size()]);
         this.urlClassLoader = new URLClassLoader(urlArray, Thread.currentThread().getContextClassLoader());
     }
@@ -145,6 +147,7 @@ public abstract class AbstractJavaProcessSynopsis {
     /**
      * 过滤方法上的注解等数据获取到所有的API定义,此处的结果只有元数据
      * 如:clazzMateData,javaFileMateData,methodMateData
+     *
      * @see DefaultJavaApiDefinition
      */
     protected abstract void getApiMetadata();
@@ -156,11 +159,12 @@ public abstract class AbstractJavaProcessSynopsis {
 
     /**
      * 把Java的class类转换为API数据定义
+     *
      * @param apiJavaClasses
      * @param javaDependencySourceFileContext
      * @return
      */
-    protected List<ApiDefinition> doGetApiDefinition(List<Class<?>> apiJavaClasses,JavaSourceFileContext javaDependencySourceFileContext){
+    protected List<ApiDefinition> doGetApiDefinition(List<Class<?>> apiJavaClasses, JavaSourceFileContext javaDependencySourceFileContext) {
         List<ApiDefinition> definitions = apiJavaClasses.stream().map(k -> {
             JavaApiParser parse = new JavaApiParser(javaDependencySourceFileContext);
             List<ApiDefinition> res = parse.parse(k);
@@ -174,10 +178,13 @@ public abstract class AbstractJavaProcessSynopsis {
 
     private void buildHtml() {
         try {
-            ThymeleafUtil.buildHtml("template",this.javaConfig.getOutPutDir()+File.separator+"index.html",this.apiDefinitions,this.javaConfig);
+            ThymeleafUtil.buildHtml("template", this.javaConfig.getOutPutDir() + File.separator + "index.html", this.apiDefinitions, this.javaConfig);
+            /*  解析为可以导入到PostMan的json文件格式 */
+            PostManApiJson postManApi = PostManApiJson.build(apiDefinitions);
+            PostManUtils.outPutToFile(this.javaConfig.getOutPutDir() + File.separator + "index.json", postManApi);
         } catch (IOException e) {
             log.info("生成API的html文件出错");
-            log.error("生成API的html文件出错",e);
+            log.error("生成API的html文件出错", e);
         }
     }
 }
