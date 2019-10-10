@@ -1,10 +1,8 @@
 package cn.xuxiaobu.doc.apis.processor.note;
 
 import cn.xuxiaobu.doc.apis.annotions.Apis;
-import cn.xuxiaobu.doc.apis.definition.DefaultJavaApiDefinition;
-import cn.xuxiaobu.doc.apis.definition.ReturnTypeDefinition;
-import cn.xuxiaobu.doc.apis.definition.TypeShowDefinition;
-import cn.xuxiaobu.doc.apis.definition.TypeWrapper;
+import cn.xuxiaobu.doc.apis.definition.*;
+import cn.xuxiaobu.doc.apis.enums.CustomTagType;
 import cn.xuxiaobu.doc.apis.initialization.JavaSourceFileContext;
 import cn.xuxiaobu.doc.util.processor.AnnotationUtils;
 import cn.xuxiaobu.doc.util.regx.PatternInit;
@@ -158,12 +156,15 @@ public class JavaMethodVisitor extends VoidVisitorAdapter<DefaultJavaApiDefiniti
                 /* 注解不为null 且 注解中的paramsType的长度大于 i */
                 parameterType = paramsApis.paramsType()[i];
             }
+
+            List<CustomTags> defaultValueList = CustomTagType.defaultValue.getTagFromString(paramDoc.getContent().toText()).orElse(null);
+            String defaultValue = defaultValueList == null ? "" : defaultValueList.get(0).getValue();
             TypeWrapper parameterTypeWrapper = WrapperUtils.getInstance(parameterType);
             TypeShowDefinition typeShowDefinition = new TypeShowDefinition()
                     .setName(parameter.getName())
                     .setCompleteTypeShow(parameterTypeWrapper.getTypeName())
                     .setReturnTypeShow(parameterTypeWrapper.getSimpleName())
-                    .setDefaultValue("")
+                    .setDefaultValue(defaultValue)
                     .setDescription(paramDoc.getContent().toText())
                     .setIfCollection(parameterTypeWrapper.ifArrayOrCollection())
                     .setBelongsToClassName(parameterTypeWrapper.getCompleteClassName());

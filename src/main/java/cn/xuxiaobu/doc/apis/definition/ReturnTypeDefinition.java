@@ -1,6 +1,7 @@
 package cn.xuxiaobu.doc.apis.definition;
 
 
+import cn.xuxiaobu.doc.apis.enums.CustomTagType;
 import cn.xuxiaobu.doc.util.processor.GenericityUtils;
 import cn.xuxiaobu.doc.util.wrapper.WrapperUtils;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,11 +77,13 @@ public class ReturnTypeDefinition {
      * @return
      */
     private TypeShowDefinition initTypeShowDefinition() {
+        List<CustomTags> defaultValueList = CustomTagType.defaultValue.getTagFromString(this.description).orElse(null);
+        String defaultValue = defaultValueList == null ? "" : defaultValueList.get(0).getValue();
         TypeShowDefinition typeShowDefinition = new TypeShowDefinition()
                 .setName("result")
                 .setCompleteTypeShow(returnType.getTypeName())
                 .setReturnTypeShow(returnType.getSimpleName())
-                .setDefaultValue("")
+                .setDefaultValue(defaultValue)
                 .setDescription(this.description)
                 .setIfCollection(returnType.ifArrayOrCollection())
                 .setBelongsToClassName(returnType.getCompleteClassName());

@@ -24,8 +24,8 @@ public class PatternInit {
     public static Pattern classNameReg = Pattern.compile(".*(?=\\.).");
     /**  去掉java类型的泛型, 如: java.lang.List<String> -> java.lang.List , Map<String,Object> -> Map  */
     public static Pattern classTypeGeneric = Pattern.compile("<.*>");
-
-
+    /**  配置文本中的自定义tag */
+    public static Pattern customTagPattern = Pattern.compile("\\s?@\\w+\\(.+?\\)\\s?");
 
     public static void main(String[] args) throws FileNotFoundException {
         Path path = Paths.get("D:\\javaWorkSpace\\xbapi-docs\\src\\main\\java\\cn\\xuxiaobu\\doc\\util\\regx\\PatternInit.java");
